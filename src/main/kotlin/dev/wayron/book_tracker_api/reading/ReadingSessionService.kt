@@ -1,10 +1,7 @@
 package dev.wayron.book_tracker_api.reading
 
 import dev.wayron.book_tracker_api.book.model.Book
-import dev.wayron.book_tracker_api.reading.model.Reading
-import dev.wayron.book_tracker_api.reading.model.ReadingRequest
-import dev.wayron.book_tracker_api.reading.model.ReadingState
-import dev.wayron.book_tracker_api.reading.model.TrackingMethod
+import dev.wayron.book_tracker_api.reading.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -41,6 +38,31 @@ class ReadingSessionService(
     )
     logger.info("Creating reading $newReadingSession")
     return sessionRepository.save(newReadingSession)
+  }
+
+  fun getReadingSessionById(id: Int): ReadingSession {
+    return sessionRepository.getReferenceById(id)
+  }
+
+  fun getReadingSessionsByBookId(bookId: Int): List<ReadingSession> {
+    return sessionRepository.findAll().filter { it.bookId.id == bookId }
+  }
+
+  fun addReading(readingSessionId: Int, quantityRead: Int): ReadingLog {
+    val log = ReadingLog(
+      id = 0,
+      readingSession = getReadingSessionById(readingSessionId),
+      dateOfReading = LocalDateTime.now(),
+      quantityRead = quantityRead
+    )
+
+    val session = getReadingSessionById(readingSessionId)
+    session.totalProgress += quantityRead
+
+    sessionRepository.save(session)
+    logRepository.save(log)
+
+    return log
   }
 
 }

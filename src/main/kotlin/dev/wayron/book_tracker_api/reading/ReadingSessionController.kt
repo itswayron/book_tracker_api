@@ -28,5 +28,10 @@ class ReadingSessionController(private val service: ReadingSessionService) {
     return ResponseEntity.status(HttpStatus.OK).body(service.getReadingSessionsByBookId(bookId))
   }
 
+  @PostMapping("/add/{sessionId}")
+  fun addReading(@PathVariable sessionId: Int, @RequestBody request: AddReadingRequest): ResponseEntity<ReadingLog> {
+    return ResponseEntity.status(HttpStatus.OK).body(service.addReading(sessionId, request.quantityRead))
+  }
+
 
 }
