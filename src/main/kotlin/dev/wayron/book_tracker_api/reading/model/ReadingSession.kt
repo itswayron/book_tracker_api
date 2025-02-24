@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.reading.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import dev.wayron.book_tracker_api.book.model.Book
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
@@ -7,7 +8,8 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "readings")
-data class Reading(
+@JsonIgnoreProperties("hibernateLazyInitializer", "handler")
+data class ReadingSession(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Int,
@@ -17,8 +19,8 @@ data class Reading(
   @JoinColumn(name = "book_id")
   val bookId: Book,
   val progressInPercentage: Double,
-  val totalProgress: Int,
-  val pages: Int,
+  var totalProgress: Int,
+  var pages: Int,
   val chapters: Int? = 0,
 
   @Enumerated(EnumType.STRING)

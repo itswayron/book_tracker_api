@@ -1,14 +1,21 @@
 package dev.wayron.book_tracker_api.reading.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "reading_log")
 data class ReadingLog(
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id:Int,
-  val readingId: Int,
+
+  @NotNull
+  @ManyToOne
+  @JoinColumn(name = "reading_id")
+  val readingSession: ReadingSession,
+
   val dateOfReading: LocalDateTime = LocalDateTime.now(),
   val quantityRead: Int,
 )

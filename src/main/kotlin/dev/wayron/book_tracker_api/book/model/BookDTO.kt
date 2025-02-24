@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.book.model
 
-import dev.wayron.book_tracker_api.reading.model.Reading
+import dev.wayron.book_tracker_api.reading.model.ReadingSession
 
 data class BookDTO(
   val id: Int,
@@ -8,6 +8,6 @@ data class BookDTO(
   val author: String,
   val pages: Int,
   val chapters: Int?,
-  val reading: Reading,
+  val readingSession: ReadingSession,
 ) {
 }

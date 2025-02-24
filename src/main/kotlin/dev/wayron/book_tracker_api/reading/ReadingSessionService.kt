@@ -11,17 +11,21 @@ import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
 @Service
-class ReadingService(private val repository: ReadingRepository, private val webClient: WebClient) {
-  private val logger = LoggerFactory.getLogger(ReadingService::class.java)
+class ReadingSessionService(
+  private val sessionRepository: ReadingSessionRepository,
+  private val logRepository: ReadingLogRepository,
+  private val webClient: WebClient
+) {
+  private val logger = LoggerFactory.getLogger(ReadingSessionService::class.java)
 
-  fun createReading(readingRequest: ReadingRequest): Reading {
+  fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSession {
     val book = webClient.get()
-      .uri("/books/${readingRequest.bookId}")
+      .uri("/books/${readingSessionRequest.bookId}")
       .retrieve()
       .bodyToMono(Book::class.java)
       .block()
 
-    val newReading = Reading(
+    val newReadingSession = ReadingSession(
       id = 0,
       bookId = book!!,
       progressInPercentage = 0.0,
@@ -29,14 +33,14 @@ class ReadingService(private val repository: ReadingRepository, private val webC
       pages = book.pages,
       chapters = book.chapters,
       readingState = ReadingState.READING,
-      trackingMethod = readingRequest.trackingMethod ?: TrackingMethod.PAGES,
-      dailyGoal = readingRequest.dailyGoal ?: 0,
-      startReadingDate = readingRequest.startReadingDate ?: LocalDateTime.now(),
+      trackingMethod = readingSessionRequest.trackingMethod ?: TrackingMethod.PAGES,
+      dailyGoal = readingSessionRequest.dailyGoal ?: 0,
+      startReadingDate = readingSessionRequest.startReadingDate ?: LocalDateTime.now(),
       endReadingDate = null,
-      estimatedCompletionDate = readingRequest.estimatedCompletionDate,
+      estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate,
     )
-    logger.info("Creating reading $newReading")
-    return repository.save(newReading)
+    logger.info("Creating reading $newReadingSession")
+    return sessionRepository.save(newReadingSession)
   }
 
 }

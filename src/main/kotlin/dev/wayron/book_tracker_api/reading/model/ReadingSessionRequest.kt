@@ -2,7 +2,7 @@ package dev.wayron.book_tracker_api.reading.model
 
 import java.time.LocalDateTime
 
-data class ReadingRequest(
+data class ReadingSessionRequest(
   var bookId: Int? = null,
   val trackingMethod: TrackingMethod? = TrackingMethod.PAGES,
   val dailyGoal: Int? = 0,
