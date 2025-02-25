@@ -57,7 +57,8 @@ class ReadingSessionService(
     )
 
     val session = getReadingSessionById(readingSessionId)
-    session.totalProgress += quantityRead
+
+    session.addProgress(quantityRead)
 
     sessionRepository.save(session)
     logRepository.save(log)
