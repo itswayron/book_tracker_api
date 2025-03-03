@@ -1,0 +1,6 @@
+package dev.wayron.book_tracker_api.exceptions.readingSession
+
+import dev.wayron.book_tracker_api.exceptions.ExceptionErrorMessages
+import java.lang.IllegalStateException
+
+class ReadingSessionCompletedException : IllegalStateException(ExceptionErrorMessages.READING_ALREADY_FINISHED.message)

@@ -1,36 +1,44 @@
 package dev.wayron.book_tracker_api.reading
 
 import dev.wayron.book_tracker_api.book.model.Book
-import dev.wayron.book_tracker_api.mappers.Mappers
+import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
+import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionCompletedException
+import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.reading.model.*
 import dev.wayron.book_tracker_api.reading.model.dto.ReadingLogDTO
 import dev.wayron.book_tracker_api.reading.model.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.utils.Mappers
+import dev.wayron.book_tracker_api.validations.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
 @Service
-class ReadingSessionService(
+class ReadingService(
   private val sessionRepository: ReadingSessionRepository,
   private val logRepository: ReadingLogRepository,
   private val webClient: WebClient
 ) {
-  private val logger = LoggerFactory.getLogger(ReadingSessionService::class.java)
+  private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
   fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionDTO {
     logger.info("Creating a ReadingSession for the book with ID: ${readingSessionRequest.bookId}")
     val book = webClient.get()
       .uri("/books/${readingSessionRequest.bookId}")
       .retrieve()
+      .onStatus({ status -> status.is4xxClientError || status.is5xxServerError }) {
+        logger.error("Book with ID ${readingSessionRequest.bookId} not found.")
+        throw BookNotFoundException()
+      }
       .bodyToMono(Book::class.java)
-      .block()
+      .block() ?: throw BookNotFoundException()
 
-    logger.info("Book found: '${book!!.title}' (ID: ${book.id}")
+    logger.info("Book found: '${book.title}' (ID: ${book.id}")
 
     val newReadingSession = ReadingSession(
       id = 0,
-      bookId = book!!,
+      bookId = book,
       progressInPercentage = 0.0,
       totalProgress = 0,
       pages = book.pages,
@@ -43,6 +51,8 @@ class ReadingSessionService(
       estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate,
     )
 
+    Validator.validateReadingSession(newReadingSession)
+
     logger.info("Creating reading session for book ${book.title} (ID: ${book.id}).")
     sessionRepository.save(newReadingSession)
 
@@ -52,13 +62,22 @@ class ReadingSessionService(
 
   fun getReadingSessionById(id: Int): ReadingSession {
     logger.info("Fetching reading session with ID: $id")
+
+    val session = sessionRepository.findById(id).orElseThrow {
+      logger.error("Session with ID $id not found.")
+      throw ReadingSessionNotFoundException()
+    }
+
+    logger.info("Retrieved the reading session with ID $id to the book: ${session.bookId.title}")
     return sessionRepository.getReferenceById(id)
   }
 
   fun getReadingSessionsByBookId(bookId: Int): List<ReadingSessionDTO> {
     logger.info("Fetching reading sessions for book ID: $bookId.")
-    val list = sessionRepository.findAll().filter { it.bookId.id == bookId }
-      .map { Mappers.mapReadingSessionToDTO(it) }
+    val book = getReadingSessionById(bookId)
+
+    val list = sessionRepository.findByBookId(book.id).map { Mappers.mapReadingSessionToDTO(it) }
+
     logger.info("Found ${list.size} reading sessions for book ID: $bookId.")
     return list
   }
@@ -67,12 +86,15 @@ class ReadingSessionService(
     logger.info("Adding $quantityRead units to reading session ID: $readingSessionId")
     val session = getReadingSessionById(readingSessionId)
 
+    if (session.readingState == ReadingState.READ) throw ReadingSessionCompletedException()
     val log = ReadingLog(
       id = 0,
       readingSession = session,
       dateOfReading = LocalDateTime.now(),
       quantityRead = quantityRead
     )
+
+    Validator.validateReadingLog(log)
 
     session.addProgress(quantityRead)
     logger.info("$quantityRead units added to session ID: $readingSessionId")

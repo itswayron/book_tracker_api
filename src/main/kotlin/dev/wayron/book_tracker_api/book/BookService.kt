@@ -1,6 +1,9 @@
 package dev.wayron.book_tracker_api.book
 
 import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
+import dev.wayron.book_tracker_api.utils.Sanitizers
+import dev.wayron.book_tracker_api.validations.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -12,7 +15,9 @@ class BookService(private val repository: BookRepository) {
 
   fun createBook(book: Book): Book {
     logger.info("Creating book with the following information: $book ")
-    return repository.save(book).apply { logger.info("Book created with the ID: $id, $title at $createdAt") }
+    val bookSanitized = Sanitizers.sanitizeBook(book)
+    Validator.validateBook(bookSanitized)
+    return repository.save(bookSanitized).apply { logger.info("Book created with the ID: $id, $title at $createdAt") }
   }
 
   fun getBooks(): List<Book> {
@@ -22,12 +27,22 @@ class BookService(private val repository: BookRepository) {
 
   fun getBookById(id: Int): Book {
     logger.info("Fetching book with the ID $id")
-    return repository.getReferenceById(id).apply { logger.info("Retrieved book with the ID: $id - Title $title") }
+
+    val book = repository.findById(id)
+      .orElseThrow {
+        logger.error("Book with the ID $id not found.")
+        throw BookNotFoundException()
+      }
+
+    logger.info("Retrieved book with the ID: $id - Title ${book.title}")
+    return book
   }
 
   fun updateBook(command: Pair<Int, Book>): Book {
-    val (id, bookUpdated) = command
+    var (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
+    bookUpdated = Sanitizers.sanitizeBook(bookUpdated)
+    Validator.validateBook(bookUpdated)
     bookUpdated.updatedAt = Timestamp(System.currentTimeMillis())
     bookUpdated.id = id
     return repository.save(bookUpdated).apply { logger.info("Book updated with the ID: $id, $title at $updatedAt") }

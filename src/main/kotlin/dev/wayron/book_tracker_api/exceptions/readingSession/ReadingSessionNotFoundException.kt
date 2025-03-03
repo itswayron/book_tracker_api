@@ -1,0 +1,6 @@
+package dev.wayron.book_tracker_api.exceptions.readingSession
+
+import dev.wayron.book_tracker_api.exceptions.ExceptionErrorMessages
+import jakarta.persistence.EntityNotFoundException
+
+class ReadingSessionNotFoundException : EntityNotFoundException(ExceptionErrorMessages.READING_NOT_FOUND.message)
