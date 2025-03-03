@@ -34,7 +34,6 @@ object Validator {
       errors.add(ValidationErrorMessages.FUTURE_END_READING.message)
     }
 
-
     if (errors.isNotEmpty()) {
       logger.error("Reading session invalid.")
       throw ReadingSessionNotValidException(errors)
