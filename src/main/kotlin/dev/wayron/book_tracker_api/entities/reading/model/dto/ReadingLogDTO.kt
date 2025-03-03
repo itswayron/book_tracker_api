@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.reading.model.dto
+package dev.wayron.book_tracker_api.entities.reading.model.dto
 
 import java.time.LocalDateTime
 

@@ -1,11 +1,8 @@
-package dev.wayron.book_tracker_api.book.model
+package dev.wayron.book_tracker_api.entities.book.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import dev.wayron.book_tracker_api.book.converter.JsonConverter
+import dev.wayron.book_tracker_api.entities.book.converter.JsonConverter
 import jakarta.persistence.*
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import java.sql.Timestamp
 import java.time.LocalDate
 
@@ -17,16 +14,8 @@ data class Book(
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   var id: Int,
 
-  @NotNull(message = "Title must not be blank")
-  @NotBlank(message = "Title must not be blank")
   val title: String,
-
-  @NotNull(message = "Author must not be blank")
-  @NotBlank(message = "Author must not be blank")
   val author: String,
-
-  @NotNull(message = "Pages must not be null")
-  @Min(value = 1, message = "Pages must be greater than 0")
   val pages: Int,
   val chapters: Int?,
 
@@ -43,7 +32,7 @@ data class Book(
 
   @Column(name = "created_at", updatable = false)
   var createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
-  var updatedAt: Timestamp  = Timestamp(System.currentTimeMillis()),
+  var updatedAt: Timestamp = Timestamp(System.currentTimeMillis()),
 ) {
 
   @PrePersist

@@ -1,9 +1,12 @@
-package dev.wayron.book_tracker_api.reading.model
+package dev.wayron.book_tracker_api.entities.reading.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.Book
+import dev.wayron.book_tracker_api.entities.reading.model.enums.ReadingState
+import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 
 @Entity
@@ -30,13 +33,13 @@ data class ReadingSession(
   @Enumerated(EnumType.STRING)
   @Column(name = "tracking_method")
   val trackingMethod: TrackingMethod = TrackingMethod.PAGES,
+
   var dailyGoal: Int = 0,
 
   val startReadingDate: LocalDateTime = LocalDateTime.now(),
   var endReadingDate: LocalDateTime?,
   var estimatedCompletionDate: LocalDateTime?,
 ) {
-
   fun addProgress(quantityRead: Int) {
     if (readingState == ReadingState.READ) return
 

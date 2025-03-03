@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.utils
 
-import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.Book
 
 object Sanitizers {
   fun sanitizeBook(book: Book): Book {

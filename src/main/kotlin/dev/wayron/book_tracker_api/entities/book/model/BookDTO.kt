@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.book.model
+package dev.wayron.book_tracker_api.entities.book.model
 
 data class BookDTO(
   val id: Int,

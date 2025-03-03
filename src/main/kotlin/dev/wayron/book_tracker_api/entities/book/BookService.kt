@@ -1,6 +1,7 @@
-package dev.wayron.book_tracker_api.book
+package dev.wayron.book_tracker_api.entities.book
 
-import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.repositories.BookRepository
 import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.utils.Sanitizers
 import dev.wayron.book_tracker_api.validations.Validator

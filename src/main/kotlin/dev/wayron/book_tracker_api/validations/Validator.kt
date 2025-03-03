@@ -1,12 +1,12 @@
 package dev.wayron.book_tracker_api.validations
 
-import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.Book
 import dev.wayron.book_tracker_api.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.exceptions.logs.InvalidReadingLogException
 import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionNotValidException
-import dev.wayron.book_tracker_api.reading.model.ReadingLog
-import dev.wayron.book_tracker_api.reading.model.ReadingSession
-import dev.wayron.book_tracker_api.reading.model.TrackingMethod
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
+import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 

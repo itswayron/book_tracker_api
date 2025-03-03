@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.book.converter
+package dev.wayron.book_tracker_api.entities.book.converter
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.persistence.AttributeConverter

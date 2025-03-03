@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.reading.model
+package dev.wayron.book_tracker_api.entities.reading.model
 
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull

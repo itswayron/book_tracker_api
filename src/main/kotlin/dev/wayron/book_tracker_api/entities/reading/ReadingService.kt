@@ -1,12 +1,18 @@
-package dev.wayron.book_tracker_api.reading
+package dev.wayron.book_tracker_api.entities.reading
 
-import dev.wayron.book_tracker_api.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.Book
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionRequest
+import dev.wayron.book_tracker_api.entities.reading.model.enums.ReadingState
+import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
+import dev.wayron.book_tracker_api.entities.reading.repositories.ReadingLogRepository
+import dev.wayron.book_tracker_api.entities.reading.repositories.ReadingSessionRepository
 import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionNotFoundException
-import dev.wayron.book_tracker_api.reading.model.*
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingSessionDTO
 import dev.wayron.book_tracker_api.utils.Mappers
 import dev.wayron.book_tracker_api.validations.Validator
 import org.slf4j.LoggerFactory

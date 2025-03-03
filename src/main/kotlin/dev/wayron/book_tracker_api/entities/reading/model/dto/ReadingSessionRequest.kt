@@ -1,5 +1,6 @@
-package dev.wayron.book_tracker_api.reading.model
+package dev.wayron.book_tracker_api.entities.reading.model.dto
 
+import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import java.time.LocalDateTime
 
 data class ReadingSessionRequest(

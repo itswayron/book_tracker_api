@@ -1,10 +1,10 @@
-package dev.wayron.book_tracker_api.reading
+package dev.wayron.book_tracker_api.entities.reading
 
-import dev.wayron.book_tracker_api.reading.model.AddReadingRequest
-import dev.wayron.book_tracker_api.reading.model.ReadingSession
-import dev.wayron.book_tracker_api.reading.model.ReadingSessionRequest
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.AddReadingRequest
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionRequest
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 @Controller
 @RequestMapping("/readings")
-class ReadingSessionController(private val service: ReadingSessionService) {
+class ReadingSessionController(private val service: ReadingService) {
 
   @PostMapping("/{bookId}")
   fun createSessionReading(
@@ -30,9 +30,8 @@ class ReadingSessionController(private val service: ReadingSessionService) {
   }
 
   @PostMapping("/add/{sessionId}")
-  fun addReading(@PathVariable sessionId: Int, @RequestBody request: AddReadingRequest): ResponseEntity<ReadingLogDTO> {
+  fun addReading(@PathVariable sessionId: Int, @RequestBody @Valid request: AddReadingRequest): ResponseEntity<ReadingLogDTO> {
     return ResponseEntity.status(HttpStatus.OK).body(service.addReading(sessionId, request.quantityRead))
   }
-
 
 }

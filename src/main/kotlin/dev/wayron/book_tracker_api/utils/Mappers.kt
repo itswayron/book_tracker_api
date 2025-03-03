@@ -1,11 +1,11 @@
-package dev.wayron.book_tracker_api.mappers
+package dev.wayron.book_tracker_api.utils
 
-import dev.wayron.book_tracker_api.book.model.Book
-import dev.wayron.book_tracker_api.book.model.BookDTO
-import dev.wayron.book_tracker_api.reading.model.ReadingLog
-import dev.wayron.book_tracker_api.reading.model.ReadingSession
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.reading.model.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.entities.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.model.BookDTO
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
+import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
 
 object Mappers {
 
