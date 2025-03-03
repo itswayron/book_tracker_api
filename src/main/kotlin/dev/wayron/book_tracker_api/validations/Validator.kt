@@ -21,7 +21,7 @@ object Validator {
     if(session.pages <= 0) {
       errors.add(ValidationErrorMessages.PAGES_NOT_POSITIVE.message)
     }
-    if (session.trackingMethod == TrackingMethod.CHAPTERS && (session.bookId.chapters == null || session.bookId.chapters == 0)) {
+    if (session.trackingMethod == TrackingMethod.CHAPTERS && (session.book.chapters == null || session.book.chapters == 0)) {
       errors.add(ValidationErrorMessages.BOOK_HAS_NO_CHAPTERS.message)
     }
     if (session.dailyGoal < 0) {

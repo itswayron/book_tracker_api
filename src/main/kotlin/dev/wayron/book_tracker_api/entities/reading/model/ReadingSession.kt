@@ -6,7 +6,6 @@ import dev.wayron.book_tracker_api.entities.reading.model.enums.ReadingState
 import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 
 @Entity
@@ -19,8 +18,8 @@ data class ReadingSession(
 
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "book_id")
-  val bookId: Book,
+  @JoinColumn(name = "book_id", nullable = false)
+  val book: Book,
   var progressInPercentage: Double,
   var totalProgress: Int,
   var pages: Int,

@@ -12,8 +12,8 @@ object Mappers {
   fun mapReadingSessionToDTO(readingSession: ReadingSession): ReadingSessionDTO {
     return ReadingSessionDTO(
       id = readingSession.id,
-      bookId = readingSession.bookId.id,
-      bookTitle = readingSession.bookId.title,
+      bookId = readingSession.book.id,
+      bookTitle = readingSession.book.title,
       progressInPercentage = readingSession.progressInPercentage,
       totalProgress = readingSession.totalProgress,
       pages = readingSession.pages,
@@ -30,7 +30,7 @@ object Mappers {
     return ReadingLogDTO(
       readingLog.id,
       readingSessionId = readingLog.readingSession.id,
-      bookId = readingLog.readingSession.bookId.id,
+      bookId = readingLog.readingSession.book.id,
       dateOfReading = readingLog.dateOfReading,
       quantityRead = readingLog.quantityRead,
     )

@@ -44,7 +44,7 @@ class ReadingService(
 
     val newReadingSession = ReadingSession(
       id = 0,
-      bookId = book,
+      book = book,
       progressInPercentage = 0.0,
       totalProgress = 0,
       pages = book.pages,
@@ -74,7 +74,7 @@ class ReadingService(
       throw ReadingSessionNotFoundException()
     }
 
-    logger.info("Retrieved the reading session with ID $id to the book: ${session.bookId.title}")
+    logger.info("Retrieved the reading session with ID $id to the book: ${session.book.title}")
     return sessionRepository.getReferenceById(id)
   }
 
