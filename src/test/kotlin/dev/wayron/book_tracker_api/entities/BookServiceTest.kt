@@ -1,10 +1,12 @@
-package dev.wayron.book_tracker_api
+package dev.wayron.book_tracker_api.entities
 
 import dev.wayron.book_tracker_api.entities.book.BookService
 import dev.wayron.book_tracker_api.entities.book.model.Book
 import dev.wayron.book_tracker_api.entities.book.repositories.BookRepository
+import dev.wayron.book_tracker_api.exceptions.ExceptionErrorMessages
 import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.exceptions.book.BookNotValidException
+import dev.wayron.book_tracker_api.validations.ValidationErrorMessages
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -62,11 +64,9 @@ class BookServiceTest {
   fun `should throw exception when creating an invalid book`() {
     val invalidBook = book.copy(title = "")
 
-    try {
-      service.createBook(invalidBook)
-    } catch (ex: BookNotValidException) {
-      assert(ex.message == "Book is not valid.")
-    }
+    val exception = assertThrows<BookNotValidException> { service.createBook(invalidBook) }
+
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_VALID.message, exception.message)
     verify(repository, never()).save(any<Book>())
   }
 
@@ -101,7 +101,7 @@ class BookServiceTest {
 
     val exception = assertThrows<BookNotFoundException> { service.getBookById(2) }
 
-    assert(exception.message == "Book not found.")
+    assert(exception.message == ExceptionErrorMessages.BOOK_NOT_FOUND.message)
     verify(repository, times(1)).findById(2)
   }
 
@@ -131,12 +131,10 @@ class BookServiceTest {
     val invalidBook = book.copy(title = "")
     val command = Pair(1, invalidBook)
 
-    try {
-      service.updateBook(command)
-    } catch (ex: BookNotValidException) {
-      assert(ex.message == "Book is not valid.")
-      assert(ex.errors.contains("Title cannot be empty."))
-    }
+    val exception = assertThrows<BookNotValidException> { service.updateBook(command) }
+
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_VALID.message, exception.message)
+    assert(exception.errors.contains(ValidationErrorMessages.EMPTY_TITLE.message))
 
     verify(repository, never()).save(any<Book>())
   }
@@ -144,9 +142,8 @@ class BookServiceTest {
   @Test
   fun `should delete book successfully when book exist`() {
     `when`(repository.findById(book.id)).thenReturn(Optional.of(book))
-    `when`(repository.save(any<Book>())).thenReturn(book)
+    doNothing().`when`(repository).deleteById(book.id)
 
-    service.createBook(book)
     service.deleteBook(book.id)
 
     verify(repository, times(1)).deleteById(book.id)
@@ -159,7 +156,7 @@ class BookServiceTest {
 
     val exception = assertThrows<BookNotFoundException> { service.deleteBook(bookId) }
 
-    assertEquals("Book not found.", exception.message)
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.message)
     verify(repository, never()).deleteById(anyInt())
   }
 }
