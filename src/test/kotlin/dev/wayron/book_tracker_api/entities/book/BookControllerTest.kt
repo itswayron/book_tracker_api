@@ -1,8 +1,6 @@
-package dev.wayron.book_tracker_api.entities
+package dev.wayron.book_tracker_api.entities.book
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import dev.wayron.book_tracker_api.entities.book.BookController
-import dev.wayron.book_tracker_api.entities.book.BookService
 import dev.wayron.book_tracker_api.entities.book.model.Book
 import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.exceptions.book.BookNotValidException

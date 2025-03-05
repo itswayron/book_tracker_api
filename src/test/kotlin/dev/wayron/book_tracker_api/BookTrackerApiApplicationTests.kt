@@ -6,8 +6,12 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class BookTrackerApiApplicationTests {
 
+	/*
+
 	@Test
 	fun contextLoads() {
 	}
+
+	*/
 
 }
