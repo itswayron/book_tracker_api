@@ -9,5 +9,4 @@ enum class ValidationErrorMessages(val message: String) {
   NEGATIVE_DAILY_GOAL("Cannot have a negative daily goal."),
   FUTURE_START_READING("Cannot start reading a book in the future."),
   FUTURE_END_READING("Cannot finish a book on the future."),
-
 }

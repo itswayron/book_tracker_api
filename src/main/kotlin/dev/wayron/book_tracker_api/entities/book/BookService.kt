@@ -11,7 +11,6 @@ import java.sql.Timestamp
 
 @Service
 class BookService(private val repository: BookRepository) {
-
   private val logger = LoggerFactory.getLogger(BookService::class.java)
 
   fun createBook(book: Book): Book {

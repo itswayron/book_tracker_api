@@ -67,4 +67,5 @@ object Validator {
 
     logger.info("Book ${book.title} valid.")
   }
+
 }
