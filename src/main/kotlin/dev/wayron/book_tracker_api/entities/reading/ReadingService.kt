@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.entities.reading
 
-import dev.wayron.book_tracker_api.entities.book.model.Book
+import dev.wayron.book_tracker_api.entities.book.BookService
 import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
 import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
@@ -10,35 +10,25 @@ import dev.wayron.book_tracker_api.entities.reading.model.enums.ReadingState
 import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import dev.wayron.book_tracker_api.entities.reading.repositories.ReadingLogRepository
 import dev.wayron.book_tracker_api.entities.reading.repositories.ReadingSessionRepository
-import dev.wayron.book_tracker_api.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.exceptions.readingSession.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.utils.Mappers
 import dev.wayron.book_tracker_api.validations.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
 @Service
 class ReadingService(
   private val sessionRepository: ReadingSessionRepository,
   private val logRepository: ReadingLogRepository,
-  private val webClient: WebClient
+  private val bookService: BookService,
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
   fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionDTO {
     logger.info("Creating a ReadingSession for the book with ID: ${readingSessionRequest.bookId}")
-    val book = webClient.get()
-      .uri("/books/${readingSessionRequest.bookId}")
-      .retrieve()
-      .onStatus({ status -> status.is4xxClientError || status.is5xxServerError }) {
-        logger.error("Book with ID ${readingSessionRequest.bookId} not found.")
-        throw BookNotFoundException()
-      }
-      .bodyToMono(Book::class.java)
-      .block() ?: throw BookNotFoundException()
+    val book = bookService.getBookById(readingSessionRequest.bookId!!)
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
 
