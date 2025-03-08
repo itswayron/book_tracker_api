@@ -65,12 +65,12 @@ class ReadingService(
     }
 
     logger.info("Retrieved the reading session with ID $id to the book: ${session.book.title}")
-    return sessionRepository.getReferenceById(id)
+    return session
   }
 
   fun getReadingSessionsByBookId(bookId: Int): List<ReadingSessionDTO> {
     logger.info("Fetching reading sessions for book ID: $bookId.")
-    val book = getReadingSessionById(bookId)
+    val book = bookService.getBookById(bookId)
 
     val list = sessionRepository.findByBookId(book.id).map { Mappers.mapReadingSessionToDTO(it) }
 
