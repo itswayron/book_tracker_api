@@ -6,6 +6,7 @@ import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
 import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionRequest
 
 object Mappers {
 
@@ -22,6 +23,16 @@ object Mappers {
       dailyGoal = readingSession.dailyGoal,
       startReadingDate = readingSession.startReadingDate,
       endReadingDate = readingSession.endReadingDate,
+      estimatedCompletionDate = readingSession.estimatedCompletionDate
+    )
+  }
+
+  fun mapReadingSessionToRequest(readingSession: ReadingSession):ReadingSessionRequest {
+    return ReadingSessionRequest(
+      bookId = readingSession.book.id,
+      trackingMethod = readingSession.trackingMethod,
+      dailyGoal = readingSession.dailyGoal,
+      startReadingDate = readingSession.startReadingDate,
       estimatedCompletionDate = readingSession.estimatedCompletionDate
     )
   }
