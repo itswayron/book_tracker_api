@@ -48,7 +48,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `createBook should create a new book successfully`() {
+  fun `should successfully create a new book`() {
     `when`(repository.save(any<Book>())).thenReturn(book)
 
     val result = service.createBook(book)
@@ -60,7 +60,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should throw exception when creating an invalid book`() {
+  fun `should throw exception for invalid book creation`() {
     val invalidBook = book.copy(title = "")
 
     val exception = assertThrows<BookNotValidException> { service.createBook(invalidBook) }
@@ -70,7 +70,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should return a list of books`() {
+  fun `should return a list of books successfully`() {
     val books = listOf(book)
     `when`(repository.findAll()).thenReturn(books)
 
@@ -82,20 +82,20 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should return a single book`() {
+  fun `should return the correct book by id`() {
     `when`(repository.findById(book.id)).thenReturn(Optional.of(book))
 
     val result = service.getBookById(1)
 
-    assert(result.title == "Example book")
-    assert(result.author == "Example author")
-    assert(result.pages == 100)
-    assert(result.chapters == 10)
+    assertEquals(result.title, "Example book")
+    assertEquals(result.author, "Example author")
+    assertEquals(result.pages, 100)
+    assertEquals(result.chapters, 10)
     verify(repository, times(1)).findById(1)
   }
 
   @Test
-  fun `should throw exception when searching invalid id`() {
+  fun `should throw exception if book is not found by id`() {
     `when`(repository.findById(2)).thenReturn(Optional.empty())
 
     val exception = assertThrows<BookNotFoundException> { service.getBookById(2) }
@@ -105,7 +105,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should update book successfully`() {
+  fun `should successfully update a book`() {
     val bookUpdated = book.copy(
       title = "New Title",
       author = "New Author",
@@ -126,7 +126,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should throw exception when book is invalid`() {
+  fun `should throw exception for invalid book update`() {
     val invalidBook = book.copy(title = "")
     val command = Pair(1, invalidBook)
 
@@ -139,7 +139,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should delete book successfully when book exist`() {
+  fun `should successfully delete a book if it exists`() {
     `when`(repository.findById(book.id)).thenReturn(Optional.of(book))
     doNothing().`when`(repository).deleteById(book.id)
 
@@ -149,7 +149,7 @@ class BookServiceTest {
   }
 
   @Test
-  fun `should throw exception when book does not exist`() {
+  fun `should throw exception if book to delete is not found`() {
     val bookId = 99
     `when`(repository.findById(bookId)).thenThrow(BookNotFoundException())
 

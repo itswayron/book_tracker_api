@@ -52,7 +52,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should create book successfully`() {
+  fun `should successfully create a book`() {
     `when`(service.createBook(book)).thenReturn(book)
 
     val bookJson = objectMapper.writeValueAsString(book)
@@ -72,7 +72,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return bad request when creating book invalid`() {
+  fun `should return bad request for invalid book creation`() {
     val invalidBook = book.copy(title = "", author = "", pages = -1, chapters = -1)
     `when`(service.createBook(invalidBook)).thenThrow(
       BookNotValidException(
@@ -104,7 +104,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return list of books`() {
+  fun `should return a list of books successfully`() {
     val list = listOf(book, book.copy(title = "Another book", author = "Another author"))
     `when`(service.getBooks()).thenReturn(list)
 
@@ -121,7 +121,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return empty list when no books are found`() {
+  fun `should return an empty list when no books are available`() {
     `when`(service.getBooks()).thenReturn(emptyList())
 
     mockMvc.perform(get("/books"))
@@ -133,7 +133,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return single book`() {
+  fun `should return the correct book by id`() {
     `when`(service.getBookById(book.id)).thenReturn(book)
 
     mockMvc.perform(get("/books/${book.id}"))
@@ -149,7 +149,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return 404 when book is not found`() {
+  fun `should return 404 if book is not found`() {
     `when`(service.getBookById(99)).thenThrow(BookNotFoundException())
 
     mockMvc.perform(get("/books/99"))
@@ -159,7 +159,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return bad request when updating invalid book`() {
+  fun `should return bad request for invalid book update`() {
     val invalidBook = book.copy(title = "")
     `when`(service.createBook(book)).thenReturn(book)
     `when`(service.updateBook(Pair(1, invalidBook))).thenThrow(BookNotValidException(listOf("Invalid book")))
@@ -175,7 +175,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should update book successfully`() {
+  fun `should successfully update a book`() {
     val newBook = book.copy(title = "Book updated", author = "Author updated.")
     `when`(service.createBook(book)).thenReturn(book)
     `when`(service.updateBook(Pair(1, newBook))).thenReturn(newBook)
@@ -197,7 +197,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return 404 when book is not found while updating the book`() {
+  fun `should return 404 if book is not found during update`() {
     val newBook = book.copy(title = "Book updated", author = "Author updated.")
     `when`(service.createBook(book)).thenReturn(book)
     `when`(service.updateBook(Pair(99, newBook))).thenThrow(BookNotFoundException())
@@ -214,7 +214,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should delete book successfully when book exist`() {
+  fun `should successfully delete a book if it exists`() {
     doNothing().`when`(service).deleteBook(1)
 
     mockMvc.perform(delete("/books/1"))
@@ -224,7 +224,7 @@ class BookControllerTest {
   }
 
   @Test
-  fun `should return 404 when book to delete is not found`() {
+  fun `should return 404 if book to delete is not found`() {
     `when`(service.deleteBook(99)).thenThrow(BookNotFoundException())
 
     mockMvc.perform(delete("/books/99"))
