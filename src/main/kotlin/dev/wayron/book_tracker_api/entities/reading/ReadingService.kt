@@ -17,6 +17,7 @@ import dev.wayron.book_tracker_api.validations.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Service
 class ReadingService(
@@ -42,9 +43,9 @@ class ReadingService(
       readingState = ReadingState.READING,
       trackingMethod = readingSessionRequest.trackingMethod ?: TrackingMethod.PAGES,
       dailyGoal = readingSessionRequest.dailyGoal ?: 0,
-      startReadingDate = readingSessionRequest.startReadingDate ?: LocalDateTime.now(),
+      startReadingDate = readingSessionRequest.startReadingDate?.truncatedTo(ChronoUnit.MINUTES) ?: LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
       endReadingDate = null,
-      estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate,
+      estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES),
     )
 
     Validator.validateReadingSession(newReadingSession)

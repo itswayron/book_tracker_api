@@ -7,6 +7,7 @@ import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
 import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionRequest
+import java.time.temporal.ChronoUnit
 
 object Mappers {
 
@@ -21,9 +22,9 @@ object Mappers {
       chapters = readingSession.chapters,
       readingState = readingSession.readingState,
       dailyGoal = readingSession.dailyGoal,
-      startReadingDate = readingSession.startReadingDate,
-      endReadingDate = readingSession.endReadingDate,
-      estimatedCompletionDate = readingSession.estimatedCompletionDate
+      startReadingDate = readingSession.startReadingDate.truncatedTo(ChronoUnit.MINUTES),
+      endReadingDate = readingSession.endReadingDate?.truncatedTo(ChronoUnit.MINUTES),
+      estimatedCompletionDate = readingSession.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES)
     )
   }
 

@@ -7,6 +7,7 @@ import dev.wayron.book_tracker_api.entities.reading.model.enums.TrackingMethod
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @Entity
 @Table(name = "readings")
@@ -35,7 +36,7 @@ data class ReadingSession(
 
   var dailyGoal: Int = 0,
 
-  val startReadingDate: LocalDateTime = LocalDateTime.now(),
+  val startReadingDate: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
   var endReadingDate: LocalDateTime?,
   var estimatedCompletionDate: LocalDateTime?,
 ) {
@@ -47,7 +48,7 @@ data class ReadingSession(
     if (dailyGoal != 0) {
       val howManyReadingsLeft = if (trackingMethod == TrackingMethod.PAGES) pages else chapters!!
       val howManyDaysLeft = kotlin.math.ceil((howManyReadingsLeft - totalProgress) / dailyGoal.toDouble())
-      estimatedCompletionDate = LocalDateTime.now().plusDays(howManyDaysLeft.toLong())
+      estimatedCompletionDate = LocalDateTime.now().plusDays(howManyDaysLeft.toLong()).truncatedTo(ChronoUnit.MINUTES)
     }
 
     progressInPercentage = when (trackingMethod) {
@@ -60,8 +61,8 @@ data class ReadingSession(
       totalProgress = if (trackingMethod == TrackingMethod.PAGES) pages else chapters!!
       dailyGoal = 0
       readingState = ReadingState.READ
-      endReadingDate = LocalDateTime.now()
-      estimatedCompletionDate = LocalDateTime.now()
+      endReadingDate = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+      estimatedCompletionDate = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
     }
   }
 
