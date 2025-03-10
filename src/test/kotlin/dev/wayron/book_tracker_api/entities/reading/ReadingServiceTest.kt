@@ -76,7 +76,7 @@ class ReadingServiceTest {
       readingState = ReadingState.READING,
       trackingMethod = TrackingMethod.PAGES,
       dailyGoal = 10,
-      startReadingDate = LocalDateTime.now(),
+      startReadingDate = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
       endReadingDate = null,
       estimatedCompletionDate = null
     )
@@ -219,12 +219,9 @@ class ReadingServiceTest {
 
     val result = readingService.addReading(readingLog.readingSession.id, readingLog.quantityRead)
 
-    val roundedExpected = readingLog.dateOfReading.truncatedTo(ChronoUnit.SECONDS)
-    val roundedActual = result.dateOfReading.truncatedTo(ChronoUnit.SECONDS)
-
     assertEquals(readingLog.id, result.id)
     assertEquals(readingLog.quantityRead, result.quantityRead)
-    assertEquals(roundedExpected, roundedActual)
+    assertEquals(readingLog.dateOfReading.truncatedTo(ChronoUnit.MINUTES), result.dateOfReading)
     assertEquals(readingLog.readingSession.id, result.readingSessionId)
 
     verify(sessionRepository, times(1)).findById(reading.id)

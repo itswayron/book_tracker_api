@@ -87,7 +87,7 @@ class ReadingService(
     val log = ReadingLog(
       id = 0,
       readingSession = session,
-      dateOfReading = LocalDateTime.now(),
+      dateOfReading = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
       quantityRead = quantityRead
     )
 
