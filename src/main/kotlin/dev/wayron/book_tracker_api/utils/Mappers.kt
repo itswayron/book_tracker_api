@@ -1,12 +1,12 @@
 package dev.wayron.book_tracker_api.utils
 
-import dev.wayron.book_tracker_api.entities.book.model.Book
-import dev.wayron.book_tracker_api.entities.book.model.BookDTO
-import dev.wayron.book_tracker_api.entities.reading.model.ReadingLog
-import dev.wayron.book_tracker_api.entities.reading.model.ReadingSession
-import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionDTO
-import dev.wayron.book_tracker_api.entities.reading.model.dto.ReadingSessionRequest
+import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookDTO
+import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
+import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogDTO
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import java.time.temporal.ChronoUnit
 
 object Mappers {
@@ -28,7 +28,7 @@ object Mappers {
     )
   }
 
-  fun mapReadingSessionToRequest(readingSession: ReadingSession):ReadingSessionRequest {
+  fun mapReadingSessionToRequest(readingSession: ReadingSession): ReadingSessionRequest {
     return ReadingSessionRequest(
       bookId = readingSession.book.id,
       trackingMethod = readingSession.trackingMethod,

@@ -1,0 +1,6 @@
+package dev.wayron.book_tracker_api.modules.exceptions.reading
+
+import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
+import java.lang.IllegalStateException
+
+class InvalidReadingLogException : IllegalStateException(ExceptionErrorMessages.LOG_WITH_INVALID_VALUE.message)
