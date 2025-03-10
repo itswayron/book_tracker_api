@@ -1,9 +1,9 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
+import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.utils.ValidationErrorMessages
 import org.junit.jupiter.api.BeforeEach
@@ -12,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -107,30 +110,34 @@ class BookControllerTest {
   @Test
   fun `should return a list of books successfully`() {
     val list = listOf(book, book.copy(title = "Another book", author = "Another author"))
-    `when`(service.getBooks()).thenReturn(list)
+    val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "title"))
+    val pageableResponse = PageImpl(list.sortedBy { it.title })
+    `when`(service.getBooks(pageable)).thenReturn(pageableResponse)
 
-    mockMvc.perform(get("/books"))
+    mockMvc.perform(get("/books?page=0&size=10&sort=title&direction=ASC"))
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.size()").value(list.size))
-      .andExpect(jsonPath("$[0].title").value("Example book"))
-      .andExpect(jsonPath("$[0].author").value("Example author"))
-      .andExpect(jsonPath("$[1].title").value("Another book"))
-      .andExpect(jsonPath("$[1].author").value("Another author"))
+      .andExpect(jsonPath("$.content.size()").value(list.size))
+      .andExpect(jsonPath("$.content[1].title").value("Example book"))
+      .andExpect(jsonPath("$.content[1].author").value("Example author"))
+      .andExpect(jsonPath("$.content[0].title").value("Another book"))
+      .andExpect(jsonPath("$.content[0].author").value("Another author"))
 
-    verify(service, times(1)).getBooks()
+    verify(service, times(1)).getBooks(pageable)
   }
 
   @Test
   fun `should return an empty list when no books are available`() {
-    `when`(service.getBooks()).thenReturn(emptyList())
+    val pageableResponse = PageImpl(emptyList<Book>())
+    val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "title"))
+    `when`(service.getBooks(pageable)).thenReturn(pageableResponse)
 
-    mockMvc.perform(get("/books"))
+    mockMvc.perform(get("/books?page=0&size=10&sort=title&direction=ASC"))
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.size()").value(0))
+      .andExpect(jsonPath("$.content.size()").value(0))
 
-    verify(service, times(1)).getBooks()
+    verify(service, times(1)).getBooks(pageable)
   }
 
   @Test

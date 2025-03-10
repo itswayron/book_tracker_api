@@ -6,6 +6,8 @@ import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.utils.Sanitizers
 import dev.wayron.book_tracker_api.utils.Validator
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
 
@@ -20,9 +22,11 @@ class BookService(private val repository: BookRepository) {
     return repository.save(bookSanitized).apply { logger.info("Book created with the ID: $id, $title at $createdAt") }
   }
 
-  fun getBooks(): List<Book> {
+  fun getBooks(pageable: Pageable): Page<Book> {
     logger.info("Fetching all books from the repository")
-    return repository.findAll().apply { logger.info("Retrieved $size books") }
+    val page = repository.findAll(pageable)
+    logger.info("Retrieved ${page.content.size} books")
+    return page
   }
 
   fun getBookById(id: Int): Book {

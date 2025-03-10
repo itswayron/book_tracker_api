@@ -13,6 +13,9 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import java.sql.Timestamp
 import java.util.*
 import kotlin.test.assertEquals
@@ -72,13 +75,15 @@ class BookServiceTest {
   @Test
   fun `should return a list of books successfully`() {
     val books = listOf(book)
-    `when`(repository.findAll()).thenReturn(books)
+    val pageableResponse = PageImpl(books)
+    `when`(repository.findAll(any<Pageable>())).thenReturn(pageableResponse)
 
-    val result = service.getBooks()
+    val pageable = PageRequest.of(0, 10)
+    val result = service.getBooks(pageable)
 
-    assert(result.size == 1)
-    assert(result[0].title == "Example book")
-    verify(repository, times(1)).findAll()
+    assert(result.content.size == 1)
+    assert(result.content[0].title == "Example book")
+    verify(repository, times(1)).findAll(any<Pageable>())
   }
 
   @Test
