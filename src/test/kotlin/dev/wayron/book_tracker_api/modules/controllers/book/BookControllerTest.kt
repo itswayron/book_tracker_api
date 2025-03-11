@@ -5,7 +5,7 @@ import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.services.book.BookService
-import dev.wayron.book_tracker_api.utils.ValidationErrorMessages
+import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

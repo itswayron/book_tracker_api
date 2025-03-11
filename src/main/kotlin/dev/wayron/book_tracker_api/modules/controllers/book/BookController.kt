@@ -1,14 +1,13 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
-import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.book.BookDTO
+import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.utils.Mappers
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -46,7 +45,7 @@ class BookController(private val service: BookService) {
   }
 
   @DeleteMapping("/{id}")
-  fun deleteBook(@PathVariable id: Int): ResponseEntity<Void> {
+  fun deleteBook(@PathVariable id: Int): ResponseEntity<Unit> {
     service.deleteBook(id)
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
   }

@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.utils
+package dev.wayron.book_tracker_api.modules.validations
 
 enum class ValidationErrorMessages(val message: String) {
   EMPTY_TITLE("Title cannot be empty."),

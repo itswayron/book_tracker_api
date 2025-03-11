@@ -13,7 +13,7 @@ import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRe
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.utils.Mappers
-import dev.wayron.book_tracker_api.utils.Validator
+import dev.wayron.book_tracker_api.modules.validations.ValidatorOld
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -48,7 +48,7 @@ class ReadingService(
       estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES),
     )
 
-    Validator.validateReadingSession(newReadingSession)
+    ValidatorOld.validateReadingSession(newReadingSession)
 
     logger.info("Creating reading session for book ${book.title} (ID: ${book.id}).")
     sessionRepository.save(newReadingSession)
@@ -91,7 +91,7 @@ class ReadingService(
       quantityRead = quantityRead
     )
 
-    Validator.validateReadingLog(log)
+    ValidatorOld.validateReadingLog(log)
 
     session.addProgress(quantityRead)
     logger.info("$quantityRead units added to session ID: $readingSessionId")

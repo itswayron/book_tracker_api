@@ -1,10 +1,10 @@
 package dev.wayron.book_tracker_api.modules.services.book
 
+import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
-import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
+import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.utils.Sanitizers
-import dev.wayron.book_tracker_api.utils.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service
 import java.sql.Timestamp
 
 @Service
-class BookService(private val repository: BookRepository) {
+class BookService(private val repository: BookRepository, private val validator: Validator<Book>) {
   private val logger = LoggerFactory.getLogger(BookService::class.java)
 
   fun createBook(book: Book): Book {
     logger.info("Creating book with the following information: $book ")
     val bookSanitized = Sanitizers.sanitizeBook(book)
-    Validator.validateBook(bookSanitized)
+    validator.validate(bookSanitized)
     return repository.save(bookSanitized).apply { logger.info("Book created with the ID: $id, $title at $createdAt") }
   }
 
@@ -46,7 +46,7 @@ class BookService(private val repository: BookRepository) {
     var (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
     bookUpdated = Sanitizers.sanitizeBook(bookUpdated)
-    Validator.validateBook(bookUpdated)
+    validator.validate(bookUpdated)
     bookUpdated.updatedAt = Timestamp(System.currentTimeMillis())
     bookUpdated.id = id
     return repository.save(bookUpdated).apply { logger.info("Book updated with the ID: $id, $title at $updatedAt") }

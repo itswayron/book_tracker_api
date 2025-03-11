@@ -15,7 +15,7 @@ import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogE
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
 import dev.wayron.book_tracker_api.utils.Mappers
-import dev.wayron.book_tracker_api.utils.ValidationErrorMessages
+import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
