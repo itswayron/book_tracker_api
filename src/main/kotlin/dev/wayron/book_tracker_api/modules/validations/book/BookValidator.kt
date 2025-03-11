@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class BookValidator : Validator<Book> {
-
   private val logger = LoggerFactory.getLogger(BookValidator::class.java)
 
   override fun validate(t: Book) {

@@ -17,6 +17,7 @@ import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.reading.ReadingLogValidator
+import dev.wayron.book_tracker_api.modules.validations.reading.ReadingSessionValidator
 import dev.wayron.book_tracker_api.utils.Mappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,8 +45,12 @@ class ReadingServiceTest {
   @Mock
   private val logValidator: Validator<ReadingLog> = ReadingLogValidator()
 
+  @Mock
+  private val readingValidator: Validator<ReadingSession> = ReadingSessionValidator()
+
   @InjectMocks
-  private val readingService = ReadingService(sessionRepository, logRepository, bookService, logValidator)
+  private val readingService =
+    ReadingService(sessionRepository, logRepository, bookService, logValidator, readingValidator)
 
   private lateinit var book: Book
   private lateinit var reading: ReadingSession

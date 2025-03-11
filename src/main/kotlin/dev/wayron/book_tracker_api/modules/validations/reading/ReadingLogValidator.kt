@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class ReadingLogValidator : Validator<ReadingLog> {
-
   private val logger = LoggerFactory.getLogger(ReadingLogValidator::class.java)
+
   override fun validate(t: ReadingLog) {
     logger.info("Validating log.")
     if (t.quantityRead <= 0) {

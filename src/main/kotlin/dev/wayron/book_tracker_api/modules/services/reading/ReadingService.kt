@@ -1,6 +1,7 @@
 package dev.wayron.book_tracker_api.modules.services.reading
 
-import dev.wayron.book_tracker_api.modules.services.book.BookService
+import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
+import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogDTO
@@ -10,11 +11,9 @@ import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
-import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
-import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
+import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.utils.Mappers
-import dev.wayron.book_tracker_api.modules.validations.ValidatorOld
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -25,7 +24,8 @@ class ReadingService(
   private val sessionRepository: ReadingSessionRepository,
   private val logRepository: ReadingLogRepository,
   private val bookService: BookService,
-  private val logValidator: Validator<ReadingLog>
+  private val logValidator: Validator<ReadingLog>,
+  private val readingValidator: Validator<ReadingSession>
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
@@ -45,12 +45,13 @@ class ReadingService(
       readingState = ReadingState.READING,
       trackingMethod = readingSessionRequest.trackingMethod ?: TrackingMethod.PAGES,
       dailyGoal = readingSessionRequest.dailyGoal ?: 0,
-      startReadingDate = readingSessionRequest.startReadingDate?.truncatedTo(ChronoUnit.MINUTES) ?: LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
+      startReadingDate = readingSessionRequest.startReadingDate?.truncatedTo(ChronoUnit.MINUTES) ?: LocalDateTime.now()
+        .truncatedTo(ChronoUnit.MINUTES),
       endReadingDate = null,
       estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES),
     )
 
-    ValidatorOld.validateReadingSession(newReadingSession)
+    readingValidator.validate(newReadingSession)
 
     logger.info("Creating reading session for book ${book.title} (ID: ${book.id}).")
     sessionRepository.save(newReadingSession)
