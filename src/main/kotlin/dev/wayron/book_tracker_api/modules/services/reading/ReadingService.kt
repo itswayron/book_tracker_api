@@ -12,6 +12,7 @@ import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogReposi
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
+import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.utils.Mappers
 import dev.wayron.book_tracker_api.modules.validations.ValidatorOld
 import org.slf4j.LoggerFactory
@@ -24,6 +25,7 @@ class ReadingService(
   private val sessionRepository: ReadingSessionRepository,
   private val logRepository: ReadingLogRepository,
   private val bookService: BookService,
+  private val logValidator: Validator<ReadingLog>
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
@@ -91,7 +93,7 @@ class ReadingService(
       quantityRead = quantityRead
     )
 
-    ValidatorOld.validateReadingLog(log)
+    logValidator.validate(log)
 
     session.addProgress(quantityRead)
     logger.info("$quantityRead units added to session ID: $readingSessionId")

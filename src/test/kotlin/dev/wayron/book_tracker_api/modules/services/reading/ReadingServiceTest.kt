@@ -1,6 +1,10 @@
 package dev.wayron.book_tracker_api.modules.services.reading
 
-import dev.wayron.book_tracker_api.modules.services.book.BookService
+import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
+import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
+import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogException
+import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
+import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
@@ -9,13 +13,11 @@ import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
-import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
-import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
-import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogException
-import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
-import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
-import dev.wayron.book_tracker_api.utils.Mappers
+import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
+import dev.wayron.book_tracker_api.modules.validations.Validator
+import dev.wayron.book_tracker_api.modules.validations.reading.ReadingLogValidator
+import dev.wayron.book_tracker_api.utils.Mappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -39,8 +41,11 @@ class ReadingServiceTest {
   @Mock
   private val bookService: BookService = mock(BookService::class.java)
 
+  @Mock
+  private val logValidator: Validator<ReadingLog> = ReadingLogValidator()
+
   @InjectMocks
-  private val readingService = ReadingService(sessionRepository, logRepository, bookService)
+  private val readingService = ReadingService(sessionRepository, logRepository, bookService, logValidator)
 
   private lateinit var book: Book
   private lateinit var reading: ReadingSession
@@ -233,16 +238,15 @@ class ReadingServiceTest {
   fun `should throw exception for invalid reading log`() {
     val invalidLog = readingLog.copy(quantityRead = -10)
 
-    val spyReadingService = spy(readingService)
-
-    doReturn(invalidLog.readingSession).`when`(spyReadingService).getReadingSessionById(invalidLog.readingSession.id)
+    `when`(sessionRepository.findById(reading.id)).thenReturn(Optional.of(reading))
 
     val exception = assertThrows<InvalidReadingLogException> {
-      spyReadingService.addReading(invalidLog.readingSession.id, invalidLog.quantityRead)
+      readingService.addReading(invalidLog.readingSession.id, invalidLog.quantityRead)
     }
 
     assertEquals(ExceptionErrorMessages.LOG_WITH_INVALID_VALUE.message, exception.message)
-    verify(spyReadingService, times(1)).addReading(invalidLog.readingSession.id, invalidLog.quantityRead)
+    verify(logRepository, never()).save(invalidLog)
+    verify(sessionRepository, never()).save(invalidLog.readingSession)
   }
 
   @Test
