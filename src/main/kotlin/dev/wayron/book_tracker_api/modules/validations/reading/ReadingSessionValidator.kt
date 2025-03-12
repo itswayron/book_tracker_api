@@ -44,9 +44,9 @@ class ReadingSessionValidator : Validator<ReadingSession> {
   }
 
   fun validateTracking(chapters: Int?, tracking: TrackingMethod, errors: MutableList<String>) {
-    logger.info("Validating session tracking: $tracking")
+    logger.info("Validating session tracking: $tracking, chapters: $chapters")
 
-    if (tracking == TrackingMethod.CHAPTERS && (chapters == null || chapters == 0)) {
+    if (tracking == TrackingMethod.CHAPTERS && (chapters == null || chapters <= 0)) {
       logger.error("Invalid tracking method.")
       errors.add(ValidationErrorMessages.BOOK_HAS_NO_CHAPTERS.message)
     } else {
@@ -58,7 +58,7 @@ class ReadingSessionValidator : Validator<ReadingSession> {
   fun validateDailyGoal(dailyGoal: Int, errors: MutableList<String>) {
     logger.info("Validating session daily goal: $dailyGoal")
 
-    if (dailyGoal <= 0) {
+    if (dailyGoal < 0) {
       logger.error("Invalid daily goal.")
       errors.add(ValidationErrorMessages.NEGATIVE_DAILY_GOAL.message)
     } else {
