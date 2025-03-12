@@ -37,8 +37,8 @@ data class ReadingSession(
   var dailyGoal: Int = 0,
 
   val startReadingDate: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
-  var endReadingDate: LocalDateTime?,
-  var estimatedCompletionDate: LocalDateTime?,
+  var endReadingDate: LocalDateTime? = null,
+  var estimatedCompletionDate: LocalDateTime? = null,
 ) {
   fun addProgress(quantityRead: Int) {
     if (readingState == ReadingState.READ) return

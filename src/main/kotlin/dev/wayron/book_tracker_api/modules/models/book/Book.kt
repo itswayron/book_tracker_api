@@ -17,18 +17,18 @@ data class Book(
   val title: String,
   val author: String,
   val pages: Int,
-  val chapters: Int?,
+  val chapters: Int? = null,
 
-  val synopsis: String?,
-  val publisher: String?,
-  val publicationDate: LocalDate?,
-  val language: String?,
-  val isbn10: String?,
-  val isbn13: String?,
-  val typeOfMedia: String?,
+  val synopsis: String? = null,
+  val publisher: String? = null,
+  val publicationDate: LocalDate? = null,
+  val language: String? = null,
+  val isbn10: String? = null,
+  val isbn13: String? = null,
+  val typeOfMedia: String? = null,
 
   @Convert(converter = JsonConverter::class)
-  val genres: List<String>?,
+  val genres: List<String>? = emptyList(),
 
   @Column(name = "created_at", updatable = false)
   var createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
