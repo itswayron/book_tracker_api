@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
 import dev.wayron.book_tracker_api.modules.models.book.Book
-import dev.wayron.book_tracker_api.modules.models.book.BookDTO
+import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.utils.Mappers
 import jakarta.validation.Valid
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 class BookController(private val service: BookService) {
 
   @PostMapping
-  fun createBook(@RequestBody @Valid book: Book): ResponseEntity<BookDTO> {
+  fun createBook(@RequestBody @Valid book: Book): ResponseEntity<BookResponse> {
     val bookCreated = service.createBook(book)
     return ResponseEntity.status(HttpStatus.CREATED).body(Mappers.mapBookToDTO(bookCreated))
   }
@@ -28,19 +28,19 @@ class BookController(private val service: BookService) {
     @RequestParam(defaultValue = "10") size: Int,
     @RequestParam(defaultValue = "updatedAt") sort: String,
     @RequestParam(defaultValue = "DESC") direction: String
-  ): ResponseEntity<Page<BookDTO>> {
+  ): ResponseEntity<Page<BookResponse>> {
     val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort))
     val bookPage = service.getBooks(pageable).map { Mappers.mapBookToDTO(it) }
     return ResponseEntity.status(HttpStatus.OK).body(bookPage)
   }
 
   @GetMapping("/{id}")
-  fun getBookById(@PathVariable id: Int): ResponseEntity<BookDTO> {
+  fun getBookById(@PathVariable id: Int): ResponseEntity<BookResponse> {
     return ResponseEntity.status(HttpStatus.OK).body(Mappers.mapBookToDTO(service.getBookById(id)))
   }
 
   @PutMapping("/{id}")
-  fun updateBook(@PathVariable id: Int, @RequestBody book: Book): ResponseEntity<BookDTO> {
+  fun updateBook(@PathVariable id: Int, @RequestBody book: Book): ResponseEntity<BookResponse> {
     return ResponseEntity.status(HttpStatus.OK).body(Mappers.mapBookToDTO(service.updateBook(Pair(id, book))))
   }
 

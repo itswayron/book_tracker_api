@@ -1,18 +1,18 @@
 package dev.wayron.book_tracker_api.utils
 
 import dev.wayron.book_tracker_api.modules.models.book.Book
-import dev.wayron.book_tracker_api.modules.models.book.BookDTO
+import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import java.time.temporal.ChronoUnit
 
 object Mappers {
 
-  fun mapReadingSessionToDTO(readingSession: ReadingSession): ReadingSessionDTO {
-    return ReadingSessionDTO(
+  fun mapReadingSessionToDTO(readingSession: ReadingSession): ReadingSessionResponse {
+    return ReadingSessionResponse(
       id = readingSession.id,
       bookId = readingSession.book.id,
       bookTitle = readingSession.book.title,
@@ -38,8 +38,8 @@ object Mappers {
     )
   }
 
-  fun mapReadingLogToDTO(readingLog: ReadingLog): ReadingLogDTO {
-    return ReadingLogDTO(
+  fun mapReadingLogToDTO(readingLog: ReadingLog): ReadingLogResponse {
+    return ReadingLogResponse(
       readingLog.id,
       readingSessionId = readingLog.readingSession.id,
       bookId = readingLog.readingSession.book.id,
@@ -48,8 +48,8 @@ object Mappers {
     )
   }
 
-  fun mapBookToDTO(book: Book): BookDTO {
-    return BookDTO(
+  fun mapBookToDTO(book: Book): BookResponse {
+    return BookResponse(
       id = book.id,
       title = book.title,
       author = book.author,

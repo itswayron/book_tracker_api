@@ -2,8 +2,8 @@ package dev.wayron.book_tracker_api.modules.controllers.reading
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev.wayron.book_tracker_api.modules.models.reading.dto.AddReadingRequest
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
@@ -44,8 +44,8 @@ class ReadingSessionControllerTest {
   private lateinit var service: ReadingService
   private lateinit var request: ReadingSessionRequest
   private lateinit var requestJson: String
-  private lateinit var requestDTO: ReadingSessionDTO
-  private lateinit var logDTO: ReadingLogDTO
+  private lateinit var requestDTO: ReadingSessionResponse
+  private lateinit var logDTO: ReadingLogResponse
 
   @BeforeEach
   fun setUp() {
@@ -55,7 +55,7 @@ class ReadingSessionControllerTest {
       bookId = 1
     )
     requestJson = mapper.writeValueAsString(request)
-    requestDTO = ReadingSessionDTO(
+    requestDTO = ReadingSessionResponse(
       id = 1,
       bookId = 1,
       bookTitle = "Example author",
@@ -69,7 +69,7 @@ class ReadingSessionControllerTest {
       endReadingDate = null,
       estimatedCompletionDate = null
     )
-    logDTO = ReadingLogDTO(
+    logDTO = ReadingLogResponse(
       id = 1,
       readingSessionId = 1,
       bookId = 1,

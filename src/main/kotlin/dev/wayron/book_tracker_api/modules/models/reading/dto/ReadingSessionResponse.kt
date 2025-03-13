@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import java.time.LocalDateTime
 
-data class ReadingSessionDTO(
+data class ReadingSessionResponse(
   var id: Int,
   var bookId: Int,
   var bookTitle: String,

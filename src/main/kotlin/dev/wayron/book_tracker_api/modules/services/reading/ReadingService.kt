@@ -4,8 +4,8 @@ import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionComp
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogDTO
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionDTO
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
@@ -29,7 +29,7 @@ class ReadingService(
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
-  fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionDTO {
+  fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionResponse {
     logger.info("Creating a ReadingSession for the book with ID: ${readingSessionRequest.bookId}")
     val book = bookService.getBookById(readingSessionRequest.bookId!!)
 
@@ -72,7 +72,7 @@ class ReadingService(
     return session
   }
 
-  fun getReadingSessionsByBookId(bookId: Int): List<ReadingSessionDTO> {
+  fun getReadingSessionsByBookId(bookId: Int): List<ReadingSessionResponse> {
     logger.info("Fetching reading sessions for book ID: $bookId.")
     val book = bookService.getBookById(bookId)
 
@@ -82,7 +82,7 @@ class ReadingService(
     return list
   }
 
-  fun addReading(readingSessionId: Int, quantityRead: Int): ReadingLogDTO {
+  fun addReading(readingSessionId: Int, quantityRead: Int): ReadingLogResponse {
     logger.info("Adding $quantityRead units to reading session ID: $readingSessionId")
     val session = getReadingSessionById(readingSessionId)
 

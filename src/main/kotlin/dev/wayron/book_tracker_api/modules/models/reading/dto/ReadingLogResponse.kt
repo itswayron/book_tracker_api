@@ -3,7 +3,7 @@ package dev.wayron.book_tracker_api.modules.models.reading.dto
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime
 
-data class ReadingLogDTO(
+data class ReadingLogResponse(
   val id: Int,
   val readingSessionId: Int,
   val bookId: Int,
