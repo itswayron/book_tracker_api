@@ -1,9 +1,10 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
+import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.services.book.BookService
-import dev.wayron.book_tracker_api.utils.Mappers
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -14,12 +15,12 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/books")
-class BookController(private val service: BookService) {
+class BookController(private val service: BookService, private val mapper: BookMapper) {
 
   @PostMapping
-  fun createBook(@RequestBody @Valid book: Book): ResponseEntity<BookResponse> {
+  fun createBook(@RequestBody @Valid book: BookRequest): ResponseEntity<BookResponse> {
     val bookCreated = service.createBook(book)
-    return ResponseEntity.status(HttpStatus.CREATED).body(Mappers.mapBookToDTO(bookCreated))
+    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.entityBookToResponse(bookCreated))
   }
 
   @GetMapping
@@ -30,18 +31,18 @@ class BookController(private val service: BookService) {
     @RequestParam(defaultValue = "DESC") direction: String
   ): ResponseEntity<Page<BookResponse>> {
     val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort))
-    val bookPage = service.getBooks(pageable).map { Mappers.mapBookToDTO(it) }
+    val bookPage = service.getBooks(pageable).map { mapper.entityBookToResponse(it) }
     return ResponseEntity.status(HttpStatus.OK).body(bookPage)
   }
 
   @GetMapping("/{id}")
   fun getBookById(@PathVariable id: Int): ResponseEntity<BookResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(Mappers.mapBookToDTO(service.getBookById(id)))
+    return ResponseEntity.status(HttpStatus.OK).body(mapper.entityBookToResponse(service.getBookById(id)))
   }
 
   @PutMapping("/{id}")
   fun updateBook(@PathVariable id: Int, @RequestBody book: Book): ResponseEntity<BookResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(Mappers.mapBookToDTO(service.updateBook(Pair(id, book))))
+    return ResponseEntity.status(HttpStatus.OK).body(mapper.entityBookToResponse(service.updateBook(Pair(id, book))))
   }
 
   @DeleteMapping("/{id}")

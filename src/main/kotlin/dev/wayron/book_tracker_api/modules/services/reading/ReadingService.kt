@@ -2,19 +2,21 @@ package dev.wayron.book_tracker_api.modules.services.reading
 
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
+import dev.wayron.book_tracker_api.modules.models.mappers.ReadingMapper
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
-import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
+import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
-import dev.wayron.book_tracker_api.utils.Mappers
+import dev.wayron.book_tracker_api.security.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -25,7 +27,9 @@ class ReadingService(
   private val logRepository: ReadingLogRepository,
   private val bookService: BookService,
   private val logValidator: Validator<ReadingLog>,
-  private val readingValidator: Validator<ReadingSession>
+  private val readingValidator: Validator<ReadingSession>,
+  private val mapper: ReadingMapper,
+  private val userRepository: UserRepository,
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
@@ -57,7 +61,8 @@ class ReadingService(
     sessionRepository.save(newReadingSession)
 
     logger.info("Reading session created successfully (ID: ${newReadingSession.id}).")
-    return Mappers.mapReadingSessionToDTO(newReadingSession)
+    val response = mapper.sessionEntityToResponse(newReadingSession)
+    return response
   }
 
   fun getReadingSessionById(id: Int): ReadingSession {
@@ -76,7 +81,7 @@ class ReadingService(
     logger.info("Fetching reading sessions for book ID: $bookId.")
     val book = bookService.getBookById(bookId)
 
-    val list = sessionRepository.findByBookId(book.id).map { Mappers.mapReadingSessionToDTO(it) }
+    val list = sessionRepository.findByBookId(book.id).map { mapper.sessionEntityToResponse(it) }
 
     logger.info("Found ${list.size} reading sessions for book ID: $bookId.")
     return list
@@ -104,7 +109,8 @@ class ReadingService(
 
     sessionRepository.save(session)
     logger.info("Updated reading session saved (ID: $readingSessionId).")
-    return Mappers.mapReadingLogToDTO(log)
+    val response = mapper.logEntityToResponse(log)
+    return response
   }
 
 }
