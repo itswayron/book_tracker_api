@@ -1,8 +1,10 @@
 package dev.wayron.book_tracker_api.modules.models.book
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import dev.wayron.book_tracker_api.utils.JsonConverter
 import jakarta.persistence.*
+import org.springframework.security.core.userdetails.UserDetails
 import java.sql.Timestamp
 import java.time.LocalDate
 
@@ -18,6 +20,10 @@ data class Book(
   val author: String,
   val pages: Int,
   val chapters: Int? = null,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  var userId: UserEntity,
 
   val synopsis: String? = null,
   val publisher: String? = null,

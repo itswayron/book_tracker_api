@@ -2,6 +2,7 @@ package dev.wayron.book_tracker_api.modules.exceptions
 
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
+import dev.wayron.book_tracker_api.modules.exceptions.reading.ForbiddenActionException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
@@ -23,7 +24,8 @@ class GlobalExceptionHandler {
     ReadingSessionNotValidException::class,
     ReadingSessionNotFoundException::class,
     ReadingSessionCompletedException::class,
-    InvalidReadingLogException::class
+    InvalidReadingLogException::class,
+    ForbiddenActionException::class,
   )
   @ResponseBody
   fun handleCustomExceptions(exception: Exception, request: HttpServletRequest): ResponseEntity<ApiError> {
@@ -34,6 +36,7 @@ class GlobalExceptionHandler {
       is ReadingSessionNotFoundException -> HttpStatus.NOT_FOUND
       is ReadingSessionCompletedException -> HttpStatus.CONFLICT
       is InvalidReadingLogException -> HttpStatus.BAD_REQUEST
+      is ForbiddenActionException -> HttpStatus.UNAUTHORIZED
       else -> HttpStatus.INTERNAL_SERVER_ERROR
     }
 
@@ -44,6 +47,7 @@ class GlobalExceptionHandler {
       is ReadingSessionNotFoundException -> HttpStatus.NOT_FOUND.reasonPhrase
       is ReadingSessionCompletedException -> HttpStatus.CONFLICT.reasonPhrase
       is InvalidReadingLogException -> HttpStatus.BAD_REQUEST.reasonPhrase
+      is ForbiddenActionException -> HttpStatus.BAD_REQUEST.reasonPhrase
       else -> HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
     }
 

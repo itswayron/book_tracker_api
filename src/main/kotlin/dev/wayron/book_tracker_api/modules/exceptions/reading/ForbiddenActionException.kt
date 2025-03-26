@@ -1,0 +1,5 @@
+package dev.wayron.book_tracker_api.modules.exceptions.reading
+
+import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
+
+class ForbiddenActionException : RuntimeException(ExceptionErrorMessages.FORBIDDEN_ACCESS.message)

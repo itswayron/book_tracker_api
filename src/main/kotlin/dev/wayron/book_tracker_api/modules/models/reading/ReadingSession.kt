@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
@@ -25,6 +26,10 @@ data class ReadingSession(
   var totalProgress: Int,
   var pages: Int,
   val chapters: Int? = 0,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  var userId: UserEntity,
 
   @Enumerated(EnumType.STRING)
   @Column(name = "reading_state")

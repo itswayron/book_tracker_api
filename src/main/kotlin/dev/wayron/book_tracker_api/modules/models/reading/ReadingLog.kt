@@ -1,9 +1,11 @@
 package dev.wayron.book_tracker_api.modules.models.reading
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
 
 @Entity
@@ -12,6 +14,10 @@ data class ReadingLog(
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   val id: Int,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  var userId: UserEntity,
 
   @NotNull
   @ManyToOne

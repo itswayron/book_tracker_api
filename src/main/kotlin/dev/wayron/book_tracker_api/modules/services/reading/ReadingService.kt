@@ -38,6 +38,8 @@ class ReadingService(
     val book = bookService.getBookById(readingSessionRequest.bookId!!)
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
+    val username = SecurityContextHolder.getContext().authentication.name
+    val user = userRepository.findByUsername(username).orElseThrow()
 
     val newReadingSession = ReadingSession(
       id = 0,
@@ -53,6 +55,7 @@ class ReadingService(
         .truncatedTo(ChronoUnit.MINUTES),
       endReadingDate = null,
       estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES),
+      userId = user,
     )
 
     readingValidator.validate(newReadingSession)
@@ -92,14 +95,20 @@ class ReadingService(
     val session = getReadingSessionById(readingSessionId)
 
     if (session.readingState == ReadingState.READ) throw ReadingSessionCompletedException()
+    val username = SecurityContextHolder.getContext().authentication.name
+    val user = userRepository.findByUsername(username).orElseThrow()
+
     val log = ReadingLog(
       id = 0,
       readingSession = session,
       dateOfReading = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
-      quantityRead = quantityRead
+      quantityRead = quantityRead,
+      userId = user,
     )
 
     logValidator.validate(log)
+
+    log.userId = session.userId
 
     session.addProgress(quantityRead)
     logger.info("$quantityRead units added to session ID: $readingSessionId")
