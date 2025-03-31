@@ -4,10 +4,16 @@ import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookRequest
+import dev.wayron.book_tracker_api.modules.models.book.BookResponse
+import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.book.BookValidator
+import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
+import dev.wayron.book_tracker_api.security.repository.UserRepository
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -30,13 +36,30 @@ class BookServiceTest {
   @Mock
   private val validator: Validator<Book> = mock(BookValidator::class.java)
 
+  @Mock
+  private val userRepository: UserRepository = mock(UserRepository::class.java)
+
+  @Mock
+  private val mapper : BookMapper = mock(BookMapper::class.java)
+
+  @Mock
+  private val userValidator: UserAccessValidator = mock(UserAccessValidator::class.java)
+
   @InjectMocks
-  private val service = BookService(repository, validator)
+  private val service = BookService(repository, validator, userRepository, userValidator, mapper)
 
   private lateinit var book: Book
+  private lateinit var user: UserEntity
+  private lateinit var bookRequest: BookRequest
+  private lateinit var bookResponse: BookResponse
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     book = Book(
       id = 1,
       title = "Example book",
@@ -52,7 +75,21 @@ class BookServiceTest {
       typeOfMedia = null,
       genres = null,
       createdAt = Timestamp(System.currentTimeMillis()),
-      updatedAt = Timestamp(System.currentTimeMillis())
+      updatedAt = Timestamp(System.currentTimeMillis()),
+      userId = user
+    )
+    bookRequest = BookRequest(
+      title = book.title,
+      author = book.author,
+      pages = book.pages,
+      chapters = book.chapters,
+    )
+    bookResponse = BookResponse(
+      id = 1,
+      title = book.title,
+      author = book.author,
+      pages = book.pages,
+      chapters = book.chapters,
     )
   }
 
@@ -60,7 +97,7 @@ class BookServiceTest {
   fun `should successfully create a new book`() {
     `when`(repository.save(any<Book>())).thenReturn(book)
 
-    val result = service.createBook(book)
+    val result = service.createBook(bookRequest)
     assert(result.title == "Example book")
     assert(result.author == "Example author")
     assert(result.id == 1)
@@ -71,10 +108,11 @@ class BookServiceTest {
   @Test
   fun `should throw exception for invalid book creation`() {
     val invalidBook = book.copy(title = "")
+    val invalidBookRequest = bookRequest.copy(title = "")
     doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message))).`when`(validator)
       .validate(invalidBook)
 
-    val exception = assertThrows<BookNotValidException> { service.createBook(invalidBook) }
+    val exception = assertThrows<BookNotValidException> { service.createBook(invalidBookRequest) }
 
     assertEquals(ExceptionErrorMessages.BOOK_NOT_VALID.message, exception.message)
     verify(repository, never()).save(invalidBook)
@@ -125,7 +163,13 @@ class BookServiceTest {
       pages = 200,
       chapters = 10,
     )
-    val command = Pair(1, bookUpdated)
+    val bookUpdatedRequest = bookRequest.copy(
+      title = "New Title",
+      author = "New Author",
+      pages = 200,
+      chapters = 10,
+    )
+    val command = Pair(1, bookUpdatedRequest)
 
     `when`(repository.save(any<Book>())).thenReturn(bookUpdated)
     val result = service.updateBook(command)
@@ -141,9 +185,10 @@ class BookServiceTest {
   @Test
   fun `should throw exception for invalid book update`() {
     val invalidBook = book.copy(title = "")
+    val invalidBookRequest = bookRequest.copy(title = "")
     doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message))).`when`(validator)
       .validate(invalidBook)
-    val command = Pair(1, invalidBook)
+    val command = Pair(1, invalidBookRequest)
 
     val exception = assertThrows<BookNotValidException> { service.updateBook(command) }
 

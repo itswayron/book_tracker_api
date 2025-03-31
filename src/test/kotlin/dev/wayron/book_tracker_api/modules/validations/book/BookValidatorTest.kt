@@ -3,6 +3,7 @@ package dev.wayron.book_tracker_api.modules.validations.book
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -14,9 +15,15 @@ class BookValidatorTest {
 
   private lateinit var validator: BookValidator
   private lateinit var book: Book
+  private lateinit var user: UserEntity
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     validator = BookValidator()
     book = Book(
       id = 1,
@@ -31,7 +38,8 @@ class BookValidatorTest {
       isbn10 = null,
       isbn13 = null,
       typeOfMedia = null,
-      genres = null
+      genres = null,
+      userId = user
     )
   }
 

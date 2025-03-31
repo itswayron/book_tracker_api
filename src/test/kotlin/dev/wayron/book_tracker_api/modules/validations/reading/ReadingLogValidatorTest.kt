@@ -4,6 +4,7 @@ import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogE
 import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -14,14 +15,21 @@ class ReadingLogValidatorTest {
 
   private lateinit var validator: ReadingLogValidator
   private lateinit var log: ReadingLog
+  private lateinit var user: UserEntity
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     val book = Book(
       id = 1,
       title = "Example book.",
       author = "Example title",
-      pages = 100
+      pages = 100,
+      userId = user,
     )
     val session = ReadingSession(
       id = 1,
@@ -29,13 +37,15 @@ class ReadingLogValidatorTest {
       progressInPercentage = 10.0,
       totalProgress = 10,
       pages = book.pages,
+      userId = user,
     )
     validator = ReadingLogValidator()
     log = ReadingLog(
       id = 1,
       readingSession = session,
       dateOfReading = LocalDateTime.now(),
-      quantityRead = 10
+      quantityRead = 10,
+      userId = user,
     )
   }
 

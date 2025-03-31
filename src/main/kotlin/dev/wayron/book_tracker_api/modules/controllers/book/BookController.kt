@@ -1,6 +1,5 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
-import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
@@ -20,7 +19,8 @@ class BookController(private val service: BookService, private val mapper: BookM
   @PostMapping
   fun createBook(@RequestBody @Valid book: BookRequest): ResponseEntity<BookResponse> {
     val bookCreated = service.createBook(book)
-    return ResponseEntity.status(HttpStatus.CREATED).body(mapper.entityBookToResponse(bookCreated))
+    val response = ResponseEntity.status(HttpStatus.CREATED).body(bookCreated)
+    return response
   }
 
   @GetMapping
@@ -31,7 +31,7 @@ class BookController(private val service: BookService, private val mapper: BookM
     @RequestParam(defaultValue = "DESC") direction: String
   ): ResponseEntity<Page<BookResponse>> {
     val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort))
-    val bookPage = service.getBooks(pageable).map { mapper.entityBookToResponse(it) }
+    val bookPage = service.getBooks(pageable)
     return ResponseEntity.status(HttpStatus.OK).body(bookPage)
   }
 
@@ -41,8 +41,8 @@ class BookController(private val service: BookService, private val mapper: BookM
   }
 
   @PutMapping("/{id}")
-  fun updateBook(@PathVariable id: Int, @RequestBody book: Book): ResponseEntity<BookResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(mapper.entityBookToResponse(service.updateBook(Pair(id, book))))
+  fun updateBook(@PathVariable id: Int, @RequestBody book: BookRequest): ResponseEntity<BookResponse> {
+    return ResponseEntity.status(HttpStatus.OK).body(service.updateBook(Pair(id, book)))
   }
 
   @DeleteMapping("/{id}")

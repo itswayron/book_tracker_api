@@ -40,16 +40,7 @@ class GlobalExceptionHandler {
       else -> HttpStatus.INTERNAL_SERVER_ERROR
     }
 
-    val error = when (exception) {
-      is BookNotFoundException -> HttpStatus.NOT_FOUND.reasonPhrase
-      is BookNotValidException -> HttpStatus.BAD_REQUEST.reasonPhrase
-      is ReadingSessionNotValidException -> HttpStatus.BAD_REQUEST.reasonPhrase
-      is ReadingSessionNotFoundException -> HttpStatus.NOT_FOUND.reasonPhrase
-      is ReadingSessionCompletedException -> HttpStatus.CONFLICT.reasonPhrase
-      is InvalidReadingLogException -> HttpStatus.BAD_REQUEST.reasonPhrase
-      is ForbiddenActionException -> HttpStatus.BAD_REQUEST.reasonPhrase
-      else -> HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase
-    }
+    val error = status.reasonPhrase
 
     val details = when (exception) {
       is ReadingSessionNotValidException -> exception.errors

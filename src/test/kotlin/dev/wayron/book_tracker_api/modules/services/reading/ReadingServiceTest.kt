@@ -6,6 +6,9 @@ import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogE
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookRequest
+import dev.wayron.book_tracker_api.modules.models.book.BookResponse
+import dev.wayron.book_tracker_api.modules.models.mappers.ReadingMapper
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
@@ -18,6 +21,9 @@ import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.reading.ReadingLogValidator
 import dev.wayron.book_tracker_api.modules.validations.reading.ReadingSessionValidator
+import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
+import dev.wayron.book_tracker_api.security.repository.UserRepository
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import dev.wayron.book_tracker_api.utils.Mappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,17 +54,43 @@ class ReadingServiceTest {
   @Mock
   private val readingValidator: Validator<ReadingSession> = ReadingSessionValidator()
 
+  @Mock
+  private val mapper: ReadingMapper = mock(ReadingMapper::class.java)
+
+  @Mock
+  private val userRepository: UserRepository = mock(UserRepository::class.java)
+
+  @Mock
+  private val userAccessValidator: UserAccessValidator = mock(UserAccessValidator::class.java)
+
   @InjectMocks
   private val readingService =
-    ReadingService(sessionRepository, logRepository, bookService, logValidator, readingValidator)
+    ReadingService(
+      sessionRepository,
+      logRepository,
+      bookService,
+      logValidator,
+      readingValidator,
+      mapper,
+      userRepository,
+      userAccessValidator,
+    )
 
   private lateinit var book: Book
   private lateinit var reading: ReadingSession
   private lateinit var readingRequest: ReadingSessionRequest
   private lateinit var readingLog: ReadingLog
+  private lateinit var user: UserEntity
+  private lateinit var bookRequest: BookRequest
+  private lateinit var bookResponse: BookResponse
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     book = Book(
       id = 1,
       title = "Example book",
@@ -74,7 +106,8 @@ class ReadingServiceTest {
       typeOfMedia = null,
       genres = null,
       createdAt = Timestamp(System.currentTimeMillis()),
-      updatedAt = Timestamp(System.currentTimeMillis())
+      updatedAt = Timestamp(System.currentTimeMillis()),
+      userId = user
     )
     reading = ReadingSession(
       id = 1,
@@ -88,7 +121,8 @@ class ReadingServiceTest {
       dailyGoal = 10,
       startReadingDate = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
       endReadingDate = null,
-      estimatedCompletionDate = null
+      estimatedCompletionDate = null,
+      userId = user
     )
     readingRequest = ReadingSessionRequest(
       bookId = book.id,
@@ -100,7 +134,8 @@ class ReadingServiceTest {
     readingLog = ReadingLog(
       id = 0,
       readingSession = reading,
-      quantityRead = 10
+      quantityRead = 10,
+      userId = user
     )
     `when`(bookService.getBookById(book.id)).thenReturn(book)
   }

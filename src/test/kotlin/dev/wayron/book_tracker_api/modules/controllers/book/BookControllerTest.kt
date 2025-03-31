@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookRequest
+import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -35,29 +39,43 @@ class BookControllerTest {
   @MockitoBean
   private lateinit var service: BookService
   private lateinit var book: Book
+  private lateinit var bookRequest: BookRequest
+  private lateinit var bookResponse: BookResponse
+  private lateinit var user: UserEntity
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     book = Book(
       id = 1,
       title = "Example book",
       author = "Example author",
       pages = 100,
       chapters = 10,
-      synopsis = null,
-      publisher = null,
-      publicationDate = null,
-      language = null,
-      isbn10 = null,
-      isbn13 = null,
-      typeOfMedia = null,
-      genres = null
+      userId = user
+    )
+    bookRequest = BookRequest(
+      title = book.title,
+      author = book.author,
+      pages = book.pages,
+      chapters = book.chapters,
+    )
+    bookResponse = BookResponse(
+      id = 1,
+      title = book.title,
+      author = book.author,
+      pages = book.pages,
+      chapters = book.chapters,
     )
   }
 
   @Test
   fun `should successfully create a book`() {
-    `when`(service.createBook(book)).thenReturn(book)
+    `when`(service.createBook(bookRequest)).thenReturn(bookResponse)
 
     val bookJson = objectMapper.writeValueAsString(book)
 
@@ -72,12 +90,12 @@ class BookControllerTest {
       .andExpect(jsonPath("$.pages").value(book.pages))
       .andExpect(jsonPath("$.chapters").value(book.chapters))
 
-    verify(service, times(1)).createBook(book)
+    verify(service, times(1)).createBook(bookRequest)
   }
 
   @Test
   fun `should return bad request for invalid book creation`() {
-    val invalidBook = book.copy(title = "", author = "", pages = -1, chapters = -1)
+    val invalidBook = bookRequest.copy(title = "", author = "", pages = -1, chapters = -1)
     `when`(service.createBook(invalidBook)).thenThrow(
       BookNotValidException(
         listOf(
@@ -109,9 +127,9 @@ class BookControllerTest {
 
   @Test
   fun `should return a list of books successfully`() {
-    val list = listOf(book, book.copy(title = "Another book", author = "Another author"))
+    val list = listOf(bookResponse, bookResponse.copy(title = "Another book", author = "Another author"))
     val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "title"))
-    val pageableResponse = PageImpl(list.sortedBy { it.title })
+    val pageableResponse: Page<BookResponse> = PageImpl(list.sortedBy { it.title })
     `when`(service.getBooks(pageable)).thenReturn(pageableResponse)
 
     mockMvc.perform(get("/books?page=0&size=10&sort=title&direction=ASC"))
@@ -128,7 +146,7 @@ class BookControllerTest {
 
   @Test
   fun `should return an empty list when no books are available`() {
-    val pageableResponse = PageImpl(emptyList<Book>())
+    val pageableResponse = PageImpl(emptyList<BookResponse>())
     val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "title"))
     `when`(service.getBooks(pageable)).thenReturn(pageableResponse)
 
@@ -168,8 +186,8 @@ class BookControllerTest {
 
   @Test
   fun `should return bad request for invalid book update`() {
-    val invalidBook = book.copy(title = "")
-    `when`(service.createBook(book)).thenReturn(book)
+    val invalidBook = bookRequest.copy(title = "")
+    `when`(service.createBook(bookRequest)).thenReturn(bookResponse)
     `when`(service.updateBook(Pair(1, invalidBook))).thenThrow(BookNotValidException(listOf("Invalid book")))
 
     val invalidBookJson = objectMapper.writeValueAsString(invalidBook)
@@ -184,9 +202,9 @@ class BookControllerTest {
 
   @Test
   fun `should successfully update a book`() {
-    val newBook = book.copy(title = "Book updated", author = "Author updated.")
-    `when`(service.createBook(book)).thenReturn(book)
-    `when`(service.updateBook(Pair(1, newBook))).thenReturn(newBook)
+    val newBook = bookRequest.copy(title = "Book updated", author = "Author updated.")
+    `when`(service.createBook(bookRequest)).thenReturn(bookResponse)
+    `when`(service.updateBook(Pair(1, newBook))).thenReturn(bookResponse)
 
     val newBookJson = objectMapper.writeValueAsString(newBook)
 
@@ -195,7 +213,6 @@ class BookControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(newBookJson)
     ).andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(newBook.id))
       .andExpect(jsonPath("$.title").value(newBook.title))
       .andExpect(jsonPath("$.author").value(newBook.author))
       .andExpect(jsonPath("$.pages").value(newBook.pages))
@@ -206,8 +223,8 @@ class BookControllerTest {
 
   @Test
   fun `should return 404 if book is not found during update`() {
-    val newBook = book.copy(title = "Book updated", author = "Author updated.")
-    `when`(service.createBook(book)).thenReturn(book)
+    val newBook = bookRequest.copy(title = "Book updated", author = "Author updated.")
+    `when`(service.createBook(bookRequest)).thenReturn(bookResponse)
     `when`(service.updateBook(Pair(99, newBook))).thenThrow(BookNotFoundException())
 
     val newBookJson = objectMapper.writeValueAsString(newBook)

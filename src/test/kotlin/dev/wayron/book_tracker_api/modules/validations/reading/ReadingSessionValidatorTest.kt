@@ -5,6 +5,7 @@ import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
+import dev.wayron.book_tracker_api.security.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
@@ -16,16 +17,23 @@ class ReadingSessionValidatorTest {
 
   private lateinit var validator: ReadingSessionValidator
   private lateinit var session: ReadingSession
+  private lateinit var user: UserEntity
 
   @BeforeEach
   fun setUp() {
+    user = UserEntity(
+      username = "Example user",
+      email = "Example email",
+      password = "A very secure password"
+    )
     validator = ReadingSessionValidator()
     val book = Book(
       id = 1,
       title = "Example title.",
       author = "Example author.",
       pages = 100,
-      chapters = 10
+      chapters = 10,
+      userId = user
     )
     session = ReadingSession(
       id = 1,
@@ -34,7 +42,8 @@ class ReadingSessionValidatorTest {
       totalProgress = 10,
       pages = book.pages,
       chapters = book.chapters,
-      trackingMethod = TrackingMethod.PAGES
+      trackingMethod = TrackingMethod.PAGES,
+      userId = user
     )
   }
 

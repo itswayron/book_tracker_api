@@ -14,6 +14,7 @@ import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogReposi
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
+import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.security.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
@@ -30,6 +31,7 @@ class ReadingService(
   private val readingValidator: Validator<ReadingSession>,
   private val mapper: ReadingMapper,
   private val userRepository: UserRepository,
+  private val userAccessValidator: UserAccessValidator,
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
@@ -107,6 +109,7 @@ class ReadingService(
     )
 
     logValidator.validate(log)
+    userAccessValidator.validate(user.id, log.userId.id, user.role)
 
     log.userId = session.userId
 
