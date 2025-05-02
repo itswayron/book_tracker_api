@@ -151,7 +151,7 @@ class BookServiceTest {
 
     val exception = assertThrows<BookNotFoundException> { service.getBookById(2) }
 
-    assert(exception.message == ExceptionErrorMessages.BOOK_NOT_FOUND.message)
+    assert(exception.apiMessage == ExceptionErrorMessages.BOOK_NOT_FOUND.message)
     verify(repository, times(1)).findById(2)
   }
 
@@ -215,7 +215,7 @@ class BookServiceTest {
 
     val exception = assertThrows<BookNotFoundException> { service.deleteBook(bookId) }
 
-    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.message)
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
     verify(repository, never()).deleteById(anyInt())
   }
 }

@@ -194,7 +194,7 @@ class ReadingServiceTest {
       readingService.createReadingSession(Mappers.mapReadingSessionToRequest(readingInvalid))
     }
 
-    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.message)
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
     verify(sessionRepository, never()).save(any<ReadingSession>())
   }
 
@@ -252,7 +252,7 @@ class ReadingServiceTest {
 
     val exception = assertThrows<BookNotFoundException> { readingService.getReadingSessionsByBookId(99) }
 
-    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.message)
+    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
     verify(sessionRepository, never()).save(any<ReadingSession>())
   }
 
