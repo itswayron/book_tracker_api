@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.config.security
 
-import dev.wayron.book_tracker_api.modules.services.security.CustomUserDetailsService
 import dev.wayron.book_tracker_api.modules.services.security.TokenService
+import dev.wayron.book_tracker_api.modules.services.security.UserService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -14,7 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-  private val userDetailsService: CustomUserDetailsService,
+  private val userService: UserService,
   private val tokenService: TokenService,
 ) : OncePerRequestFilter() {
 
@@ -29,7 +29,7 @@ class JwtAuthenticationFilter(
 
     val username = tokenService.extractUsername(jwtToken)
     if (username != null && SecurityContextHolder.getContext().authentication == null) {
-      val foundUser = userDetailsService.loadUserByUsername(username)
+      val foundUser = userService.loadUserByUsername(username)
       if (tokenService.isValid(jwtToken, foundUser)) {
         updateContext(foundUser, request)
       }

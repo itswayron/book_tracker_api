@@ -10,8 +10,9 @@ import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.Sanitizers
+import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -29,9 +30,9 @@ class BookService(
 ) {
   private val logger = LoggerFactory.getLogger(BookService::class.java)
 
-  private fun getCurrentUser(): UserEntity {
+  private fun getCurrentUser(): User {
     val username = SecurityContextHolder.getContext().authentication.name
-    return userRepository.findByUsername(username).orElseThrow()
+    return userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
   }
 
   fun createBook(request: BookRequest): BookResponse {

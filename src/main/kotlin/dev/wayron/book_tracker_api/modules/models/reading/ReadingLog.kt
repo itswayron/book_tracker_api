@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.models.reading
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
@@ -16,7 +16,7 @@ data class ReadingLog(
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
-  var userId: UserEntity,
+  var userId: User,
 
   @NotNull
   @ManyToOne

@@ -16,6 +16,7 @@ import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -41,7 +42,7 @@ class ReadingService(
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
     val username = SecurityContextHolder.getContext().authentication.name
-    val user = userRepository.findByUsername(username).orElseThrow()
+    val user = userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
 
     val newReadingSession = ReadingSession(
       id = 0,
@@ -98,7 +99,7 @@ class ReadingService(
 
     if (session.readingState == ReadingState.READ) throw ReadingSessionCompletedException()
     val username = SecurityContextHolder.getContext().authentication.name
-    val user = userRepository.findByUsername(username).orElseThrow()
+    val user = userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
 
     val log = ReadingLog(
       id = 0,

@@ -8,7 +8,7 @@ import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -41,14 +41,14 @@ class BookControllerTest {
   private lateinit var book: Book
   private lateinit var bookRequest: BookRequest
   private lateinit var bookResponse: BookResponse
-  private lateinit var user: UserEntity
+  private lateinit var user: User
 
   @BeforeEach
   fun setUp() {
-    user = UserEntity(
-      username = "Example user",
+    user = User(
+      usernameField = "Example user",
       email = "Example email",
-      password = "A very secure password"
+      passwordField = "A very secure password"
     )
     book = Book(
       id = 1,

@@ -1,9 +1,8 @@
 package dev.wayron.book_tracker_api.modules.repositories
 
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
 
-interface UserRepository : JpaRepository<UserEntity, String> {
-  fun findByUsername(username: String): Optional<UserEntity>
+interface UserRepository : JpaRepository<User, String> {
+  fun findByUsernameField(username: String): User?
 }

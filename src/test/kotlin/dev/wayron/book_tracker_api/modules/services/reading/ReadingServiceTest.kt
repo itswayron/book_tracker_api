@@ -23,7 +23,7 @@ import dev.wayron.book_tracker_api.modules.validations.reading.ReadingLogValidat
 import dev.wayron.book_tracker_api.modules.validations.reading.ReadingSessionValidator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.Mappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -80,16 +80,16 @@ class ReadingServiceTest {
   private lateinit var reading: ReadingSession
   private lateinit var readingRequest: ReadingSessionRequest
   private lateinit var readingLog: ReadingLog
-  private lateinit var user: UserEntity
+  private lateinit var user: User
   private lateinit var bookRequest: BookRequest
   private lateinit var bookResponse: BookResponse
 
   @BeforeEach
   fun setUp() {
-    user = UserEntity(
-      username = "Example user",
+    user = User(
+      usernameField = "Example user",
       email = "Example email",
-      password = "A very secure password"
+      passwordField = "A very secure password"
     )
     book = Book(
       id = 1,

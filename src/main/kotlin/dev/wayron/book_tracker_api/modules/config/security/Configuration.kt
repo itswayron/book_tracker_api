@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.config.security
 
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
-import dev.wayron.book_tracker_api.modules.services.security.CustomUserDetailsService
+import dev.wayron.book_tracker_api.modules.services.security.UserService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class Configuration {
 
   @Bean
-  fun userDetailsService(userRepository: UserRepository) = CustomUserDetailsService(userRepository)
+  fun userService(userRepository: UserRepository) = UserService(userRepository, encoder())
 
   @Bean
   fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
@@ -25,7 +25,7 @@ class Configuration {
   @Bean
   fun authenticationProvider(userRepository: UserRepository): AuthenticationProvider =
     DaoAuthenticationProvider().also {
-      it.setUserDetailsService(userDetailsService(userRepository))
+      it.setUserDetailsService(userService(userRepository))
       it.setPasswordEncoder(encoder())
     }
 

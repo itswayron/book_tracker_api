@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.models.book
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.JsonConverter
 import jakarta.persistence.*
 import java.sql.Timestamp
@@ -22,7 +22,7 @@ data class Book(
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
-  var userId: UserEntity,
+  var userId: User,
 
   val synopsis: String? = null,
   val publisher: String? = null,
