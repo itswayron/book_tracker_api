@@ -15,7 +15,7 @@ import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRe
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
-import dev.wayron.book_tracker_api.security.repository.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service

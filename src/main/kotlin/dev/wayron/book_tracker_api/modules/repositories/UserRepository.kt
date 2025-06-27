@@ -1,6 +1,6 @@
-package dev.wayron.book_tracker_api.security.repository
+package dev.wayron.book_tracker_api.modules.repositories
 
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 

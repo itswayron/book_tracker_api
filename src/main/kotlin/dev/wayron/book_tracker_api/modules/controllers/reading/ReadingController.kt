@@ -5,15 +5,16 @@ import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.services.reading.ReadingService
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 
-@Controller
+@RestController
 @RequestMapping("/readings")
-class ReadingSessionController(private val service: ReadingService) {
+@SecurityRequirement(name = "bearerAuth")
+class ReadingController(private val service: ReadingService) {
 
   @PostMapping("/{bookId}")
   fun createSessionReading(

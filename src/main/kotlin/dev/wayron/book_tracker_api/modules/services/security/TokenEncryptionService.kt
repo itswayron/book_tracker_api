@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.security.service
+package dev.wayron.book_tracker_api.modules.services.security
 
 
 import org.springframework.stereotype.Service

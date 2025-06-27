@@ -1,10 +1,9 @@
 package dev.wayron.book_tracker_api.modules.models.book
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import dev.wayron.book_tracker_api.utils.JsonConverter
 import jakarta.persistence.*
-import org.springframework.security.core.userdetails.UserDetails
 import java.sql.Timestamp
 import java.time.LocalDate
 

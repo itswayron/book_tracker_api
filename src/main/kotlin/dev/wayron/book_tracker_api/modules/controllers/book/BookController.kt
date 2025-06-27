@@ -4,6 +4,7 @@ import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.services.book.BookService
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/books")
+@SecurityRequirement(name = "bearerAuth")
 class BookController(private val service: BookService, private val mapper: BookMapper) {
 
   @PostMapping

@@ -9,8 +9,8 @@ import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
-import dev.wayron.book_tracker_api.security.repository.UserRepository
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import dev.wayron.book_tracker_api.utils.Sanitizers
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page

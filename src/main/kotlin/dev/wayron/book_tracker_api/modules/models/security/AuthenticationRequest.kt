@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.security.controller.model
+package dev.wayron.book_tracker_api.modules.models.security
 
 data class AuthenticationRequest(
   val username: String,

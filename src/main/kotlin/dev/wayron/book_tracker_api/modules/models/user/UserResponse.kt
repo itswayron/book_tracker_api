@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.security.user
+package dev.wayron.book_tracker_api.modules.models.user
 
 import org.springframework.data.annotation.Id
 import java.time.LocalDateTime

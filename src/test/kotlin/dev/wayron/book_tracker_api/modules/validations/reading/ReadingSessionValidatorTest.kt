@@ -5,7 +5,7 @@ import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime

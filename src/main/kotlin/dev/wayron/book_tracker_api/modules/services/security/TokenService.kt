@@ -1,6 +1,6 @@
-package dev.wayron.book_tracker_api.security.service
+package dev.wayron.book_tracker_api.modules.services.security
 
-import dev.wayron.book_tracker_api.security.config.JwtProperties
+import dev.wayron.book_tracker_api.modules.config.security.JwtProperties
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys

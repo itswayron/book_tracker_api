@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.validations.user
 
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ForbiddenActionException
-import dev.wayron.book_tracker_api.security.user.Role
+import dev.wayron.book_tracker_api.modules.models.user.Role
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

@@ -1,9 +1,9 @@
-package dev.wayron.book_tracker_api.security.service
+package dev.wayron.book_tracker_api.modules.services.security
 
-import dev.wayron.book_tracker_api.security.repository.UserRepository
-import dev.wayron.book_tracker_api.security.user.UserEntity
-import dev.wayron.book_tracker_api.security.user.UserRequest
-import dev.wayron.book_tracker_api.security.user.UserResponse
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserRequest
+import dev.wayron.book_tracker_api.modules.models.user.UserResponse
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service

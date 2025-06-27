@@ -31,7 +31,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 @ExtendWith(SpringExtension::class)
-@WebMvcTest(ReadingSessionController::class)
+@WebMvcTest(ReadingController::class)
 class ReadingSessionControllerTest {
 
   @Autowired

@@ -1,6 +1,6 @@
-package dev.wayron.book_tracker_api.security.controller.model
+package dev.wayron.book_tracker_api.modules.models.security
 
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import jakarta.persistence.*
 import java.util.*
 

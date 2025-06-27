@@ -1,11 +1,11 @@
-package dev.wayron.book_tracker_api.security.service
+package dev.wayron.book_tracker_api.modules.services.security
 
-import dev.wayron.book_tracker_api.security.config.JwtProperties
-import dev.wayron.book_tracker_api.security.controller.model.AuthenticationRequest
-import dev.wayron.book_tracker_api.security.controller.model.AuthenticationResponse
-import dev.wayron.book_tracker_api.security.controller.model.RefreshTokenEntity
-import dev.wayron.book_tracker_api.security.repository.RefreshTokenRepository
-import dev.wayron.book_tracker_api.security.repository.UserRepository
+import dev.wayron.book_tracker_api.modules.config.security.JwtProperties
+import dev.wayron.book_tracker_api.modules.models.security.AuthenticationRequest
+import dev.wayron.book_tracker_api.modules.models.security.AuthenticationResponse
+import dev.wayron.book_tracker_api.modules.models.security.RefreshTokenEntity
+import dev.wayron.book_tracker_api.modules.repositories.RefreshTokenRepository
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails

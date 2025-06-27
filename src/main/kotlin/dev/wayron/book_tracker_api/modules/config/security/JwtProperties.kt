@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.security.config
+package dev.wayron.book_tracker_api.modules.config.security
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

@@ -1,6 +1,6 @@
-package dev.wayron.book_tracker_api.security.repository
+package dev.wayron.book_tracker_api.modules.repositories
 
-import dev.wayron.book_tracker_api.security.controller.model.RefreshTokenEntity
+import dev.wayron.book_tracker_api.modules.models.security.RefreshTokenEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

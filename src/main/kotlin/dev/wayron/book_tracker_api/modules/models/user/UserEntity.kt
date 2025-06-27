@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.security.user
+package dev.wayron.book_tracker_api.modules.models.user
 
 import dev.wayron.book_tracker_api.utils.Base62UUIDGenerator
 import jakarta.persistence.*

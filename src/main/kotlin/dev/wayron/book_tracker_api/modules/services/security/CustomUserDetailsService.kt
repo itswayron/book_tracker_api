@@ -1,11 +1,12 @@
-package dev.wayron.book_tracker_api.security.service
+package dev.wayron.book_tracker_api.modules.services.security
 
-import dev.wayron.book_tracker_api.security.repository.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 
-typealias ApplicationUser = dev.wayron.book_tracker_api.security.user.UserEntity
+typealias ApplicationUser = UserEntity
 
 class CustomUserDetailsService(private val repository: UserRepository) : UserDetailsService {
   override fun loadUserByUsername(username: String): UserDetails {

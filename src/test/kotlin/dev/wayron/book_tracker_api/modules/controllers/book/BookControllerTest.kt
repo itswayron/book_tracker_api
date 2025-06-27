@@ -8,7 +8,7 @@ import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
-import dev.wayron.book_tracker_api.security.user.UserEntity
+import dev.wayron.book_tracker_api.modules.models.user.UserEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
