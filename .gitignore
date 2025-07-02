@@ -34,4 +34,5 @@ build/
 /.gitattributes
 /mvnw.cmd
 /mvnw
-/src/main/resources/application-dev.yml
+
+
