@@ -20,6 +20,8 @@ data class Book(
   val pages: Int,
   val chapters: Int? = null,
 
+  val coverUrl: String? = null,
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
   var userId: User,
