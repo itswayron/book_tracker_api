@@ -39,4 +39,10 @@ class ReadingController(private val service: ReadingService) {
     return ResponseEntity.status(HttpStatus.OK).body(service.addReading(sessionId, request.quantityRead))
   }
 
+  @DeleteMapping("/delete/{sessionId}")
+  fun deleteReadingById(@PathVariable sessionId : Int): ResponseEntity<Unit> {
+    service.deleteReadingById(sessionId)
+    return ResponseEntity.noContent().build()
+  }
+
 }

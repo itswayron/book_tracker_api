@@ -16,6 +16,8 @@ import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
@@ -27,7 +29,7 @@ import java.time.temporal.ChronoUnit
 class ReadingService(
   private val sessionRepository: ReadingSessionRepository,
   private val logRepository: ReadingLogRepository,
-  private val bookService: BookService,
+  private val bookRepository: BookRepository,
   private val logValidator: Validator<ReadingLog>,
   private val readingValidator: Validator<ReadingSession>,
   private val mapper: ReadingMapper,
@@ -38,7 +40,7 @@ class ReadingService(
 
   fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionResponse {
     logger.info("Creating a ReadingSession for the book with ID: ${readingSessionRequest.bookId}")
-    val book = bookService.getBookById(readingSessionRequest.bookId!!)
+    val book = bookRepository.findEntityByIdOrThrow(readingSessionRequest.bookId!!)
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
     val username = SecurityContextHolder.getContext().authentication.name
@@ -85,7 +87,7 @@ class ReadingService(
 
   fun getReadingSessionsByBookId(bookId: Int): List<ReadingSessionResponse> {
     logger.info("Fetching reading sessions for book ID: $bookId.")
-    val book = bookService.getBookById(bookId)
+    val book = bookRepository.findEntityByIdOrThrow(bookId)
 
     val list = sessionRepository.findByBookId(book.id).map { mapper.sessionEntityToResponse(it) }
 
@@ -124,6 +126,13 @@ class ReadingService(
     logger.info("Updated reading session saved (ID: $readingSessionId).")
     val response = mapper.logEntityToResponse(log)
     return response
+  }
+
+  fun deleteReadingById(readingSessionId: Int) {
+    logger.info("Deleting reading session with ID: $readingSessionId")
+    val deletedReading = sessionRepository.findEntityByIdOrThrow(readingSessionId)
+    sessionRepository.deleteById(deletedReading.id)
+    logger.info("Deleted reading session with ID: $readingSessionId successfully")
   }
 
 }

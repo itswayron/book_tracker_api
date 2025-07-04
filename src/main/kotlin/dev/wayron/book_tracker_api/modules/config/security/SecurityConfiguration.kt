@@ -35,7 +35,7 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
         registry.requestMatchers(HttpMethod.GET, "/books/**", "/readings/**").permitAll()
         registry.requestMatchers(HttpMethod.POST, "/books/**", "/readings/**").authenticated()
         registry.requestMatchers(HttpMethod.PUT, "/books/**").authenticated()
-        registry.requestMatchers(HttpMethod.DELETE, "/books/**").authenticated()
+        registry.requestMatchers(HttpMethod.DELETE, "/books/**", "/readings/**").authenticated()
 
         registry.requestMatchers("/**").hasRole(Role.ADMIN.name)
         registry.anyRequest().fullyAuthenticated()
