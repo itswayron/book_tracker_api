@@ -87,7 +87,7 @@ class BookService(
   }
 
   fun updateBook(command: Pair<Int, BookRequest>): BookResponse {
-    var (id, bookUpdated) = command
+    val (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
     val user = getCurrentUser()
     val oldBook = getBookById(id)
@@ -125,12 +125,12 @@ class BookService(
   fun deleteBook(id: Int) {
     logger.info("Deleting book with the ID: $id")
 
-    val bookDeleted = getBookById(id)
-    logger.info("Book to be deleted with the ID: ${bookDeleted.id} - Title: ${bookDeleted.title}")
+    val deletedBook = getBookById(id)
+    logger.info("Book to be deleted with the ID: ${deletedBook.id} - Title: ${deletedBook.title}")
     val user = getCurrentUser()
-    userAccessValidator.validate(user.id, bookDeleted.userId.id, user.role)
+    userAccessValidator.validate(user.id, deletedBook.userId.id, user.role)
 
-    repository.deleteById(bookDeleted.id)
+    repository.deleteById(deletedBook.id)
     logger.info("Book with the ID: $id has been deleted")
   }
 

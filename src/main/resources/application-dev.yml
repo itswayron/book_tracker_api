@@ -2,19 +2,34 @@ spring:
   application:
     name: book_tracker_api
 
+  main:
+    lazy-initialization: true
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
+      initialization-fail-timeout: 0
+      minimum-idle: 1
+      idle-timeout: 10000
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
     show-sql: true
     hibernate:
       ddl-auto: none
+
+  flyway:
+    enabled: false
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: false
+    add-properties: false
 
 jwt:
   key: ${JWT_KEY}
@@ -23,3 +38,12 @@ jwt:
 logging:
   pattern:
     console: "<%green(%d{yy-MM-dd HH:mm:ss}) %highlight(%-5level) %cyan(%logger{10})> %highlight(%msg%n)"
+  level:
+    org.hibernate: warn
+    org.springframework.security: error
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
