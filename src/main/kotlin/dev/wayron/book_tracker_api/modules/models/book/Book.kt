@@ -2,8 +2,9 @@ package dev.wayron.book_tracker_api.modules.models.book
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import dev.wayron.book_tracker_api.modules.models.user.User
-import dev.wayron.book_tracker_api.utils.JsonConverter
 import jakarta.persistence.*
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.sql.Timestamp
 import java.time.LocalDate
 
@@ -34,8 +35,9 @@ data class Book(
   val isbn13: String? = null,
   val typeOfMedia: String? = null,
 
-  @Convert(converter = JsonConverter::class)
-  val genres: List<String>? = emptyList(),
+  @Column(columnDefinition = "jsonb")
+  @JdbcTypeCode(SqlTypes.JSON)
+  val genres: Set<String>? = emptySet(),
 
   @Column(name = "created_at", updatable = false)
   var createdAt: Timestamp = Timestamp(System.currentTimeMillis()),

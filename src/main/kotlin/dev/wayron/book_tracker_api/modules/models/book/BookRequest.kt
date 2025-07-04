@@ -16,5 +16,5 @@ data class BookRequest(
   val isbn13: String? = null,
   val typeOfMedia: String? = null,
 
-  val genres: List<String>? = emptyList()
+  val genres: Set<String>? = emptySet()
 )
