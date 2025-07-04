@@ -10,14 +10,13 @@ import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequ
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
-import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
-import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
-import dev.wayron.book_tracker_api.modules.services.book.BookService
-import dev.wayron.book_tracker_api.modules.validations.Validator
-import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
+import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
+import dev.wayron.book_tracker_api.modules.validations.Validator
 import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
+import dev.wayron.book_tracker_api.utils.getCurrentUser
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
@@ -33,8 +32,7 @@ class ReadingService(
   private val logValidator: Validator<ReadingLog>,
   private val readingValidator: Validator<ReadingSession>,
   private val mapper: ReadingMapper,
-  private val userRepository: UserRepository,
-  private val userAccessValidator: UserAccessValidator,
+  private val userRepository: UserRepository
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
@@ -44,7 +42,7 @@ class ReadingService(
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
     val username = SecurityContextHolder.getContext().authentication.name
-    val user = userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
+    val user = userRepository.getCurrentUser()
 
     val newReadingSession = ReadingSession(
       id = 0,
@@ -100,21 +98,15 @@ class ReadingService(
     val session = getReadingSessionById(readingSessionId)
 
     if (session.readingState == ReadingState.READ) throw ReadingSessionCompletedException()
-    val username = SecurityContextHolder.getContext().authentication.name
-    val user = userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
 
     val log = ReadingLog(
       id = 0,
       readingSession = session,
       dateOfReading = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES),
       quantityRead = quantityRead,
-      userId = user,
     )
 
     logValidator.validate(log)
-    userAccessValidator.validate(user.id, log.userId.id, user.role)
-
-    log.userId = session.userId
 
     session.addProgress(quantityRead)
     logger.info("$quantityRead units added to session ID: $readingSessionId")

@@ -1,0 +1,1 @@
+ALTER TABLE reading_log DROP COLUMN user_id;

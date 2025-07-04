@@ -6,17 +6,14 @@ import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
+import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.validations.Validator
-import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
-import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.Sanitizers
-import jakarta.persistence.EntityNotFoundException
+import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
 
@@ -25,22 +22,16 @@ class BookService(
   private val repository: BookRepository,
   private val validator: Validator<Book>,
   private val userRepository: UserRepository,
-  private val userAccessValidator: UserAccessValidator,
   private val mapper: BookMapper,
 ) {
   private val logger = LoggerFactory.getLogger(BookService::class.java)
-
-  private fun getCurrentUser(): User {
-    val username = SecurityContextHolder.getContext().authentication.name
-    return userRepository.findByUsernameField(username) ?: throw EntityNotFoundException()
-  }
 
   fun createBook(request: BookRequest): BookResponse {
     logger.info("Creating book with the following information: $request ")
     if (request.title == null || request.author == null || request.pages == null) {
       throw BookNotValidException(listOf())
     }
-    val user = getCurrentUser()
+    val user = userRepository.getCurrentUser()
     val book = Book(
       id = 0,
       title = request.title,
@@ -89,10 +80,8 @@ class BookService(
   fun updateBook(command: Pair<Int, BookRequest>): BookResponse {
     val (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
-    val user = getCurrentUser()
+    val user = userRepository.getCurrentUser()
     val oldBook = getBookById(id)
-
-    userAccessValidator.validate(user.id, oldBook.userId.id, user.role)
 
     var newBook = Book(
       id = 0,
@@ -127,8 +116,6 @@ class BookService(
 
     val deletedBook = getBookById(id)
     logger.info("Book to be deleted with the ID: ${deletedBook.id} - Title: ${deletedBook.title}")
-    val user = getCurrentUser()
-    userAccessValidator.validate(user.id, deletedBook.userId.id, user.role)
 
     repository.deleteById(deletedBook.id)
     logger.info("Book with the ID: $id has been deleted")
