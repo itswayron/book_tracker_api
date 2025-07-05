@@ -8,10 +8,9 @@ import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
-import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
-import dev.wayron.book_tracker_api.modules.validations.Validator
-import dev.wayron.book_tracker_api.modules.validations.book.BookValidator
-import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
+import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
+import dev.wayron.book_tracker_api.modules.validators.Validator
+import dev.wayron.book_tracker_api.modules.validators.book.BookValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.models.user.User
 import org.junit.jupiter.api.BeforeEach

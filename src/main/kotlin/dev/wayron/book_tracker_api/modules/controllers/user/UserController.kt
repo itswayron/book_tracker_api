@@ -1,7 +1,7 @@
 package dev.wayron.book_tracker_api.modules.controllers.user
 
-import dev.wayron.book_tracker_api.modules.config.ApiRoutes
-import dev.wayron.book_tracker_api.modules.services.security.UserService
+import dev.wayron.book_tracker_api.config.ApiRoutes
+import dev.wayron.book_tracker_api.security.services.UserService
 import dev.wayron.book_tracker_api.modules.models.user.UserRequest
 import dev.wayron.book_tracker_api.modules.models.user.UserResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement

@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.reading
 
-import dev.wayron.book_tracker_api.modules.config.ApiRoutes
+import dev.wayron.book_tracker_api.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.reading.dto.AddReadingRequest
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest

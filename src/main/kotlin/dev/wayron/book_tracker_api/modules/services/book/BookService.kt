@@ -8,7 +8,7 @@ import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
-import dev.wayron.book_tracker_api.modules.validations.Validator
+import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.utils.Sanitizers
 import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory

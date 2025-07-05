@@ -14,10 +14,9 @@ import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
-import dev.wayron.book_tracker_api.modules.validations.Validator
+import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.utils.getCurrentUser
-import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service

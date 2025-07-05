@@ -17,11 +17,10 @@ import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
 import dev.wayron.book_tracker_api.modules.services.book.BookService
-import dev.wayron.book_tracker_api.modules.validations.ValidationErrorMessages
-import dev.wayron.book_tracker_api.modules.validations.Validator
-import dev.wayron.book_tracker_api.modules.validations.reading.ReadingLogValidator
-import dev.wayron.book_tracker_api.modules.validations.reading.ReadingSessionValidator
-import dev.wayron.book_tracker_api.modules.validations.user.UserAccessValidator
+import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
+import dev.wayron.book_tracker_api.modules.validators.Validator
+import dev.wayron.book_tracker_api.modules.validators.reading.ReadingLogValidator
+import dev.wayron.book_tracker_api.modules.validators.reading.ReadingSessionValidator
 import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.Mappers

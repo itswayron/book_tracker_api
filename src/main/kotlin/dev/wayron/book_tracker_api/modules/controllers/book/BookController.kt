@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
-import dev.wayron.book_tracker_api.modules.config.ApiRoutes
+import dev.wayron.book_tracker_api.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
