@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.reading
 
+import dev.wayron.book_tracker_api.modules.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.reading.dto.AddReadingRequest
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
@@ -12,7 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/readings")
+@RequestMapping(ApiRoutes.READINGS)
 @SecurityRequirement(name = "bearerAuth")
 class ReadingController(private val service: ReadingService) {
 

@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.modules.config.security
 
+import dev.wayron.book_tracker_api.modules.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.user.Role
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -32,10 +33,13 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
         registry.requestMatchers("/login**", "/login/**", "/user/**", "/error").permitAll()
         registry.requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-        registry.requestMatchers(HttpMethod.GET, "/books/**", "/readings/**").permitAll()
-        registry.requestMatchers(HttpMethod.POST, "/books/**", "/readings/**").authenticated()
-        registry.requestMatchers(HttpMethod.PUT, "/books/**").authenticated()
-        registry.requestMatchers(HttpMethod.DELETE, "/books/**", "/readings/**").authenticated()
+        listOf(
+          "${ApiRoutes.BOOKS}/**",
+          "${ApiRoutes.READINGS}/**"
+        ).forEach {
+          registry.requestMatchers(HttpMethod.GET, it).authenticated()
+          registry.requestMatchers(it).authenticated()
+        }
 
         registry.requestMatchers("/**").hasRole(Role.ADMIN.name)
         registry.anyRequest().fullyAuthenticated()

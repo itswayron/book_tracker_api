@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.book
 
+import dev.wayron.book_tracker_api.modules.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
@@ -14,7 +15,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping(ApiRoutes.BOOKS)
 @SecurityRequirement(name = "bearerAuth")
 class BookController(private val service: BookService, private val mapper: BookMapper) {
 

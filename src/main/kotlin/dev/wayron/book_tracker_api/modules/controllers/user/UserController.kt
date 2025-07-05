@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.user
 
+import dev.wayron.book_tracker_api.modules.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.services.security.UserService
 import dev.wayron.book_tracker_api.modules.models.user.UserRequest
 import dev.wayron.book_tracker_api.modules.models.user.UserResponse
@@ -9,7 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping(ApiRoutes.USER)
 @SecurityRequirement(name = "bearerAuth")
 class UserController(private val service: UserService) {
 

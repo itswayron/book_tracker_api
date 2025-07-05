@@ -1,5 +1,6 @@
 package dev.wayron.book_tracker_api.modules.controllers.security
 
+import dev.wayron.book_tracker_api.modules.config.ApiRoutes
 import dev.wayron.book_tracker_api.modules.models.security.AuthenticationRequest
 import dev.wayron.book_tracker_api.modules.models.security.AuthenticationResponse
 import dev.wayron.book_tracker_api.modules.services.security.AuthenticationService
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping(ApiRoutes.AUTH)
 class AuthController(
   private val authenticationService: AuthenticationService
 ) {
