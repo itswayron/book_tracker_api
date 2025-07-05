@@ -10,6 +10,7 @@ import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.utils.Sanitizers
+import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -64,7 +65,7 @@ class BookService(
     return response
   }
 
-  fun getBookById(id: Int): Book {
+  fun getBookById(id: Int): BookResponse {
     logger.info("Fetching book with the ID $id")
 
     val book = repository.findById(id)
@@ -74,13 +75,14 @@ class BookService(
       }
 
     logger.info("Retrieved book with the ID: $id - Title ${book.title}")
-    return book
+    val response = mapper.entityBookToResponse(book)
+    return response
   }
 
   fun updateBook(command: Pair<Int, BookRequest>): BookResponse {
     val (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
-    val oldBook = getBookById(id)
+    val oldBook = repository.findEntityByIdOrThrow(id)
 
     var newBook = Book(
       id = 0,

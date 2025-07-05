@@ -21,9 +21,8 @@ class BookController(private val service: BookService, private val mapper: BookM
 
   @PostMapping
   fun createBook(@RequestBody @Valid book: BookRequest): ResponseEntity<BookResponse> {
-    val bookCreated = service.createBook(book)
-    val response = ResponseEntity.status(HttpStatus.CREATED).body(bookCreated)
-    return response
+    val response = service.createBook(book)
+    return ResponseEntity(response, HttpStatus.CREATED)
   }
 
   @GetMapping
@@ -34,18 +33,20 @@ class BookController(private val service: BookService, private val mapper: BookM
     @RequestParam(defaultValue = "DESC") direction: String
   ): ResponseEntity<Page<BookResponse>> {
     val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort))
-    val bookPage = service.getBooks(pageable)
-    return ResponseEntity.status(HttpStatus.OK).body(bookPage)
+    val response = service.getBooks(pageable)
+    return ResponseEntity(response, HttpStatus.OK)
   }
 
   @GetMapping("/{id}")
   fun getBookById(@PathVariable id: Int): ResponseEntity<BookResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(mapper.entityBookToResponse(service.getBookById(id)))
+    val response = service.getBookById(id)
+    return ResponseEntity(response, HttpStatus.OK)
   }
 
   @PutMapping("/{id}")
   fun updateBook(@PathVariable id: Int, @RequestBody book: BookRequest): ResponseEntity<BookResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(service.updateBook(Pair(id, book)))
+    val response = service.updateBook(Pair(id, book))
+    return ResponseEntity(response, HttpStatus.OK)
   }
 
   @DeleteMapping("/{id}")
@@ -53,5 +54,4 @@ class BookController(private val service: BookService, private val mapper: BookM
     service.deleteBook(id)
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
   }
-
 }

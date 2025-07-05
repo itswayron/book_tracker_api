@@ -24,12 +24,14 @@ class ReadingController(private val service: ReadingService) {
   ): ResponseEntity<ReadingSessionResponse> {
     val request: ReadingSessionRequest = readingSessionRequest ?: ReadingSessionRequest()
     request.bookId = bookId
-    return ResponseEntity.status(HttpStatus.CREATED).body(service.createReadingSession(request))
+    val response = service.createReadingSession(request)
+    return ResponseEntity(response, HttpStatus.CREATED)
   }
 
   @GetMapping("/{bookId}")
   fun getBookReadingSessions(@PathVariable bookId: Int): ResponseEntity<List<ReadingSessionResponse>> {
-    return ResponseEntity.status(HttpStatus.OK).body(service.getReadingSessionsByBookId(bookId))
+    val response = service.getReadingSessionsByBookId(bookId)
+    return ResponseEntity(response, HttpStatus.OK)
   }
 
   @PostMapping("/add/{sessionId}")
@@ -37,13 +39,13 @@ class ReadingController(private val service: ReadingService) {
     @PathVariable sessionId: Int,
     @RequestBody @Valid request: AddReadingRequest
   ): ResponseEntity<ReadingLogResponse> {
-    return ResponseEntity.status(HttpStatus.OK).body(service.addReading(sessionId, request.quantityRead))
+    val response = service.addReading(sessionId, request.quantityRead)
+    return ResponseEntity(response, HttpStatus.OK)
   }
 
   @DeleteMapping("/delete/{sessionId}")
-  fun deleteReadingById(@PathVariable sessionId : Int): ResponseEntity<Unit> {
+  fun deleteReadingById(@PathVariable sessionId: Int): ResponseEntity<Unit> {
     service.deleteReadingById(sessionId)
     return ResponseEntity.noContent().build()
   }
-
 }

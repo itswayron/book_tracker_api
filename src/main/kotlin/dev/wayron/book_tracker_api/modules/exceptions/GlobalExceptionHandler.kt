@@ -62,7 +62,7 @@ class GlobalExceptionHandler {
     request: HttpServletRequest
   ): ResponseEntity<ApiError> {
     val status = HttpStatus.BAD_REQUEST
-    val error = HttpStatus.BAD_REQUEST.reasonPhrase
+    val error = status.reasonPhrase
     val message = BookNotValidException(arrayListOf()).message ?: "An error occurred."
     val details = arrayListOf("Invalid JSON structure")
 
