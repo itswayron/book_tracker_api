@@ -121,5 +121,4 @@ class BookService(
     repository.deleteById(deletedBook.id)
     logger.info("Book with the ID: $id has been deleted")
   }
-
 }

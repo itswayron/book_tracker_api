@@ -13,14 +13,18 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping(ApiRoutes.BOOKS)
 @SecurityRequirement(name = "bearerAuth")
-class BookController(private val service: BookService, private val mapper: BookMapper) {
+class BookController(private val service: BookService) {
 
-  @PostMapping
-  fun createBook(@RequestBody @Valid book: BookRequest): ResponseEntity<BookResponse> {
+  @PostMapping(consumes = ["multipart/form-data"])
+  fun createBook(
+    @RequestPart("book") @RequestBody @Valid book: BookRequest,
+    @RequestPart("cover", required = false) coverFile: MultipartFile?
+  ): ResponseEntity<BookResponse> {
     val response = service.createBook(book)
     return ResponseEntity(response, HttpStatus.CREATED)
   }
@@ -43,7 +47,7 @@ class BookController(private val service: BookService, private val mapper: BookM
     return ResponseEntity(response, HttpStatus.OK)
   }
 
-  @PutMapping("/{id}")
+  @PatchMapping("/{id}")
   fun updateBook(@PathVariable id: Int, @RequestBody book: BookRequest): ResponseEntity<BookResponse> {
     val response = service.updateBook(Pair(id, book))
     return ResponseEntity(response, HttpStatus.OK)
