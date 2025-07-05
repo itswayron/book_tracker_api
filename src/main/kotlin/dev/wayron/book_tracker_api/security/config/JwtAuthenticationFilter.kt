@@ -19,13 +19,12 @@ class JwtAuthenticationFilter(
 ) : OncePerRequestFilter() {
 
   override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
-    val authHeader: String? = request.getHeader("Authorization")
-    if (authHeader.doesNotContainBearerToken()) {
+    val jwtToken = extractTokenFromHeaderOrCookie(request)
+
+    if(jwtToken == null) {
       filterChain.doFilter(request, response)
       return
     }
-
-    val jwtToken = authHeader!!.extractTokenValue()
 
     val username = tokenService.extractUsername(jwtToken)
     if (username != null && SecurityContextHolder.getContext().authentication == null) {
@@ -41,6 +40,16 @@ class JwtAuthenticationFilter(
     val authToken = UsernamePasswordAuthenticationToken(foundUser, null, foundUser.authorities)
     authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
     SecurityContextHolder.getContext().authentication = authToken
+  }
+
+  private fun extractTokenFromHeaderOrCookie(request: HttpServletRequest): String? {
+    val authHeader = request.getHeader("Authorization")
+    if(!authHeader.doesNotContainBearerToken()) {
+      return authHeader.extractTokenValue()
+    }
+
+    val tokenCookie = request.cookies?.find { it.name == "access_token" }
+    return tokenCookie?.value
   }
 
   private fun String?.doesNotContainBearerToken(): Boolean = this == null || !this.startsWith("Bearer ")
