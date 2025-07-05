@@ -37,7 +37,7 @@ jwt:
 
 logging:
   pattern:
-    console: "<%green(%d{yy-MM-dd HH:mm:ss}) %highlight(%-5level) %cyan(%logger{10})> %highlight(%msg%n)"
+    console: "[ %highlight(%-5level)] <%green(%d{yy-MM-dd HH:mm:ss}) %cyan(%logger{10})> %highlight(%msg%n)"
   level:
     org.hibernate: warn
     org.springframework.security: error

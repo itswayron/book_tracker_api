@@ -30,7 +30,7 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
       .csrf { it.disable() }
       .cors {}
       .authorizeHttpRequests { registry ->
-        registry.requestMatchers("/login**", "/login/**", "/user/**", "/error").permitAll()
+        registry.requestMatchers("/auth/**", "/auth/**", "/user/**", "/error").permitAll()
         registry.requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
         listOf(
