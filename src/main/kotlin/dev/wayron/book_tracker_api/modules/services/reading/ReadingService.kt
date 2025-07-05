@@ -18,6 +18,7 @@ import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -40,7 +41,6 @@ class ReadingService(
     val book = bookRepository.findEntityByIdOrThrow(readingSessionRequest.bookId!!)
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
-    val username = SecurityContextHolder.getContext().authentication.name
     val user = userRepository.getCurrentUser()
 
     val newReadingSession = ReadingSession(
@@ -92,6 +92,7 @@ class ReadingService(
     return list
   }
 
+  @PreAuthorize("@readingSecurity.isOwner(#readingSessionId)")
   fun addReading(readingSessionId: Int, quantityRead: Int): ReadingLogResponse {
     logger.info("Adding $quantityRead units to reading session ID: $readingSessionId")
     val session = getReadingSessionById(readingSessionId)

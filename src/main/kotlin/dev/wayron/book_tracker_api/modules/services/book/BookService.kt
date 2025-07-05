@@ -80,7 +80,6 @@ class BookService(
   fun updateBook(command: Pair<Int, BookRequest>): BookResponse {
     val (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
-    val user = userRepository.getCurrentUser()
     val oldBook = getBookById(id)
 
     var newBook = Book(

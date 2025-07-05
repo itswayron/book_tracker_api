@@ -19,7 +19,7 @@ data class ReadingSession(
   val id: Int,
 
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "book_id", nullable = false)
   val book: Book,
   var progressInPercentage: Double,

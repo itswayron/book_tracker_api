@@ -22,7 +22,7 @@ spring:
       ddl-auto: none
 
   flyway:
-    enabled: false
+    enabled: false # Enable only when doing migrations.
 
   devtools:
     restart:
