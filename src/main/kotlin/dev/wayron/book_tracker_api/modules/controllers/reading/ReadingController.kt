@@ -23,8 +23,7 @@ class ReadingController(private val service: ReadingService) {
     @RequestBody readingSessionRequest: ReadingSessionRequest?
   ): ResponseEntity<ReadingSessionResponse> {
     val request: ReadingSessionRequest = readingSessionRequest ?: ReadingSessionRequest()
-    request.bookId = bookId
-    val response = service.createReadingSession(request)
+    val response = service.createReadingSession(request, bookId)
     return ResponseEntity(response, HttpStatus.CREATED)
   }
 

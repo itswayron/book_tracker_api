@@ -2,10 +2,10 @@ package dev.wayron.book_tracker_api.modules.models.book
 
 import java.time.LocalDate
 
-data class BookRequest(
-  val title: String,
-  val author: String,
-  val pages: Int,
+data class BookPatch(
+  val title: String? = null,
+  val author: String? = null,
+  val pages: Int? = null,
   val chapters: Int? = null,
 
   val synopsis: String? = null,

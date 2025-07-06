@@ -3,15 +3,18 @@ package dev.wayron.book_tracker_api.modules.services.book
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookPatch
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
-import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.models.mappers.toEntity
+import dev.wayron.book_tracker_api.modules.models.mappers.toResponse
+import dev.wayron.book_tracker_api.modules.models.mappers.updateWith
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.getCurrentUser
 import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.utils.Sanitizers
-import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
-import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,38 +25,23 @@ import java.sql.Timestamp
 class BookService(
   private val repository: BookRepository,
   private val validator: Validator<Book>,
-  private val userRepository: UserRepository,
-  private val mapper: BookMapper,
+  private val userRepository: UserRepository
 ) {
   private val logger = LoggerFactory.getLogger(BookService::class.java)
 
   fun createBook(request: BookRequest): BookResponse {
-    logger.info("Creating book with the following information: $request ")
-    if (request.title == null || request.author == null || request.pages == null) {
-      throw BookNotValidException(listOf())
-    }
+    logger.info("Creating book with the following information: $request.")
+
     val user = userRepository.getCurrentUser()
-    val book = Book(
-      id = 0,
-      title = request.title,
-      author = request.author,
-      pages = request.pages,
-      chapters = request.chapters,
-      userId = user,
-      synopsis = request.synopsis,
-      publisher = request.publisher,
-      publicationDate = request.publicationDate,
-      language = request.language,
-      isbn10 = request.isbn10,
-      isbn13 = request.isbn13,
-      typeOfMedia = request.typeOfMedia,
-      genres = request.genres,
-    )
+    val book = request.toEntity(user)
+
     val bookSanitized = Sanitizers.sanitizeBook(book)
     validator.validate(bookSanitized)
+
     val createdBook = repository.save(bookSanitized)
     logger.info("Book created with the ID: ${createdBook.id}, ${createdBook.title} at ${createdBook.createdAt}")
-    val response = mapper.entityBookToResponse(createdBook)
+
+    val response = createdBook.toResponse()
     return response
   }
 
@@ -61,7 +49,7 @@ class BookService(
     logger.info("Fetching all books from the repository")
     val page = repository.findAll(pageable)
     logger.info("Retrieved ${page.content.size} books")
-    val response = page.map { book -> mapper.entityBookToResponse(book) }
+    val response = page.map { book -> book.toResponse() }
     return response
   }
 
@@ -75,38 +63,21 @@ class BookService(
       }
 
     logger.info("Retrieved book with the ID: $id - Title ${book.title}")
-    val response = mapper.entityBookToResponse(book)
+    val response = book.toResponse()
     return response
   }
 
-  fun updateBook(command: Pair<Int, BookRequest>): BookResponse {
+  fun updateBook(command: Pair<Int, BookPatch>): BookResponse {
     val (id, bookUpdated) = command
     logger.info("Updating the book with ID: ${id}, with the following information $bookUpdated")
     val oldBook = repository.findEntityByIdOrThrow(id)
 
-    var newBook = Book(
-      id = 0,
-      title = bookUpdated.title ?: oldBook.title,
-      author = bookUpdated.author ?: oldBook.author,
-      pages = bookUpdated.pages ?: oldBook.pages,
-      chapters = bookUpdated.chapters ?: oldBook.chapters,
-      userId = oldBook.userId,
-      synopsis = bookUpdated.synopsis ?: oldBook.synopsis,
-      publisher = bookUpdated.publisher ?: oldBook.publisher,
-      publicationDate = bookUpdated.publicationDate ?: oldBook.publicationDate,
-      language = bookUpdated.language ?: oldBook.language,
-      isbn10 = bookUpdated.isbn10 ?: oldBook.isbn10,
-      isbn13 = bookUpdated.isbn13 ?: oldBook.isbn13,
-      typeOfMedia = bookUpdated.typeOfMedia ?: oldBook.typeOfMedia,
-      genres = bookUpdated.genres ?: oldBook.genres,
-    )
-
+    var newBook = oldBook.updateWith(bookUpdated)
     newBook = Sanitizers.sanitizeBook(newBook)
 
     validator.validate(newBook)
-    newBook.updatedAt = Timestamp(System.currentTimeMillis())
-    newBook.id = id
-    val response = mapper.entityBookToResponse(repository.save(newBook))
+
+    val response = repository.save(newBook).toResponse()
     logger.info("Book updated with the ID: ${response.id}, ${response.title} at ${newBook.updatedAt}")
 
     return response

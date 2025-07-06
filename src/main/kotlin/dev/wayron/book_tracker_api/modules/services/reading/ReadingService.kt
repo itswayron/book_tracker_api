@@ -2,24 +2,23 @@ package dev.wayron.book_tracker_api.modules.services.reading
 
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionCompletedException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
-import dev.wayron.book_tracker_api.modules.models.mappers.ReadingMapper
+import dev.wayron.book_tracker_api.modules.models.mappers.toEntity
+import dev.wayron.book_tracker_api.modules.models.mappers.toResponse
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingLogResponse
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionResponse
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
-import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.getCurrentUser
 import dev.wayron.book_tracker_api.modules.validators.Validator
-import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
-import dev.wayron.book_tracker_api.utils.getCurrentUser
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -31,34 +30,18 @@ class ReadingService(
   private val bookRepository: BookRepository,
   private val logValidator: Validator<ReadingLog>,
   private val readingValidator: Validator<ReadingSession>,
-  private val mapper: ReadingMapper,
   private val userRepository: UserRepository
 ) {
   private val logger = LoggerFactory.getLogger(ReadingService::class.java)
 
-  fun createReadingSession(readingSessionRequest: ReadingSessionRequest): ReadingSessionResponse {
-    logger.info("Creating a ReadingSession for the book with ID: ${readingSessionRequest.bookId}")
-    val book = bookRepository.findEntityByIdOrThrow(readingSessionRequest.bookId!!)
+  fun createReadingSession(readingSessionRequest: ReadingSessionRequest, bookId: Int): ReadingSessionResponse {
+    logger.info("Creating a ReadingSession for the book with ID: $bookId")
+    val book = bookRepository.findEntityByIdOrThrow(bookId)
 
     logger.info("Book found: '${book.title}' (ID: ${book.id}")
     val user = userRepository.getCurrentUser()
 
-    val newReadingSession = ReadingSession(
-      id = 0,
-      book = book,
-      progressInPercentage = 0.0,
-      totalProgress = 0,
-      pages = book.pages,
-      chapters = book.chapters,
-      readingState = ReadingState.READING,
-      trackingMethod = readingSessionRequest.trackingMethod ?: TrackingMethod.PAGES,
-      dailyGoal = readingSessionRequest.dailyGoal ?: 0,
-      startReadingDate = readingSessionRequest.startReadingDate?.truncatedTo(ChronoUnit.MINUTES) ?: LocalDateTime.now()
-        .truncatedTo(ChronoUnit.MINUTES),
-      endReadingDate = null,
-      estimatedCompletionDate = readingSessionRequest.estimatedCompletionDate?.truncatedTo(ChronoUnit.MINUTES),
-      userId = user,
-    )
+    val newReadingSession = readingSessionRequest.toEntity(book, user)
 
     readingValidator.validate(newReadingSession)
 
@@ -66,7 +49,7 @@ class ReadingService(
     sessionRepository.save(newReadingSession)
 
     logger.info("Reading session created successfully (ID: ${newReadingSession.id}).")
-    val response = mapper.sessionEntityToResponse(newReadingSession)
+    val response = newReadingSession.toResponse()
     return response
   }
 
@@ -86,7 +69,7 @@ class ReadingService(
     logger.info("Fetching reading sessions for book ID: $bookId.")
     val book = bookRepository.findEntityByIdOrThrow(bookId)
 
-    val list = sessionRepository.findByBookId(book.id).map { mapper.sessionEntityToResponse(it) }
+    val list = sessionRepository.findByBookId(book.id).map { it.toResponse() }
 
     logger.info("Found ${list.size} reading sessions for book ID: $bookId.")
     return list
@@ -116,7 +99,7 @@ class ReadingService(
 
     sessionRepository.save(session)
     logger.info("Updated reading session saved (ID: $readingSessionId).")
-    val response = mapper.logEntityToResponse(log)
+    val response = log.toResponse()
     return response
   }
 

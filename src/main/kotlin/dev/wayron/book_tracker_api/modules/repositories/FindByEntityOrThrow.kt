@@ -1,4 +1,4 @@
-package dev.wayron.book_tracker_api.utils
+package dev.wayron.book_tracker_api.modules.repositories
 
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory

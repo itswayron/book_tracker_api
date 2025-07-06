@@ -21,7 +21,7 @@ import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingLogValidator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingSessionValidator
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.utils.Mappers
 import org.junit.jupiter.api.BeforeEach

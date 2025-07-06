@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.security.config
 
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.security.services.UserService
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean

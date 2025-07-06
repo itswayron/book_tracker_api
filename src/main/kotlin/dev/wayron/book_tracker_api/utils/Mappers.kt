@@ -30,7 +30,6 @@ object Mappers {
 
   fun mapReadingSessionToRequest(readingSession: ReadingSession): ReadingSessionRequest {
     return ReadingSessionRequest(
-      bookId = readingSession.book.id,
       trackingMethod = readingSession.trackingMethod,
       dailyGoal = readingSession.dailyGoal,
       startReadingDate = readingSession.startReadingDate,

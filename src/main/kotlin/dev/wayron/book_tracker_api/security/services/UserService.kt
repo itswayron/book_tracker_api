@@ -1,6 +1,6 @@
 package dev.wayron.book_tracker_api.security.services
 
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.models.user.UserRequest
 import dev.wayron.book_tracker_api.modules.models.user.UserResponse

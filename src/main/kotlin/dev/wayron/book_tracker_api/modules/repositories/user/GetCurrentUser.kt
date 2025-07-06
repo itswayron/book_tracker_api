@@ -1,7 +1,6 @@
-package dev.wayron.book_tracker_api.utils
+package dev.wayron.book_tracker_api.modules.repositories.user
 
 import dev.wayron.book_tracker_api.modules.models.user.User
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.core.context.SecurityContextHolder
 

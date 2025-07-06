@@ -1,9 +1,9 @@
 package dev.wayron.book_tracker_api.security.guards
 
-import dev.wayron.book_tracker_api.modules.repositories.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
-import dev.wayron.book_tracker_api.utils.findEntityByIdOrThrow
-import dev.wayron.book_tracker_api.utils.getCurrentUser
+import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
+import dev.wayron.book_tracker_api.modules.repositories.user.getCurrentUser
 import org.springframework.stereotype.Component
 
 @Component("readingSecurity")
