@@ -32,6 +32,7 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
       .authorizeHttpRequests { registry ->
         registry.requestMatchers("/auth/**", "/auth/**", "/user/**", "/error").permitAll()
         registry.requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+        registry.requestMatchers(HttpMethod.GET, "/images/**").permitAll()
 
         listOf(
           "${ApiRoutes.BOOKS}/**",

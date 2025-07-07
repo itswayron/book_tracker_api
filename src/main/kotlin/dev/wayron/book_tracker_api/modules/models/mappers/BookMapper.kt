@@ -29,7 +29,8 @@ fun Book.toResponse(): BookResponse = BookResponse(
   title = this.title,
   author = this.author,
   pages = this.pages,
-  chapters = this.chapters
+  chapters = this.chapters,
+  coverPath = toPublicUrl(this.coverPath),
 )
 
 fun Book.updateWith(request: BookPatch): Book {
@@ -48,4 +49,13 @@ fun Book.updateWith(request: BookPatch): Book {
     genres = request.genres ?: this.genres,
     updatedAt = Timestamp(System.currentTimeMillis())
   )
+}
+
+private fun toPublicUrl(path: String?): String? {
+  return path
+    ?.replace("\\", "/")
+    ?.substringAfter("uploads/images")
+    ?.removePrefix("/")
+    ?.removePrefix("images/")
+    ?.let { "/images/$it" }
 }

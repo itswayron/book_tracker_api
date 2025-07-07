@@ -1,9 +1,9 @@
 package dev.wayron.book_tracker_api.security.services
 
-import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.models.user.UserRequest
 import dev.wayron.book_tracker_api.modules.models.user.UserResponse
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service
 @Service
 class UserService(
   private val repository: UserRepository,
-  private val encoder: PasswordEncoder
-): UserDetailsService {
+  private val encoder: PasswordEncoder,
+) : UserDetailsService {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   override fun loadUserByUsername(username: String): UserDetails {
@@ -36,7 +36,8 @@ class UserService(
       id = user.id,
       username = user.usernameField,
       email = user.email,
-      createdAt = user.createdAt
+      createdAt = user.createdAt,
+      imageProfilePath = user.profileImagePath,
     )
     return response
   }
@@ -49,9 +50,9 @@ class UserService(
       id = user.id,
       username = user.usernameField,
       email = user.email,
-      createdAt = user.createdAt
+      createdAt = user.createdAt,
+      imageProfilePath = user.profileImagePath,
     )
     return userResponse
   }
-
 }

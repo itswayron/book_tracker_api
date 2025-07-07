@@ -8,4 +8,5 @@ enum class ExceptionErrorMessages(val message: String) {
   READING_ALREADY_FINISHED("Cannot add logs to a finished reading session."),
   LOG_WITH_INVALID_VALUE("The amount of reading must be positive."),
   FORBIDDEN_ACCESS("The user don't have permission to perform this action."),
+  INVALID_IMAGE("The image sent is not valid."),
 }

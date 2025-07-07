@@ -6,4 +6,5 @@ data class BookResponse(
   val author: String,
   val pages: Int,
   val chapters: Int?,
+  val coverPath: String?,
 )

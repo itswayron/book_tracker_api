@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.multipart.MaxUploadSizeExceededException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -22,6 +23,7 @@ class GlobalExceptionHandler {
     ReadingSessionCompletedException::class,
     InvalidReadingLogException::class,
     ForbiddenActionException::class,
+    ImageNotValidException::class,
   )
   @ResponseBody
   fun handleCustomExceptions(exception: Exception, request: HttpServletRequest): ResponseEntity<ApiError> {
@@ -49,6 +51,20 @@ class GlobalExceptionHandler {
       status = status.value(),
       error = status.reasonPhrase,
       message = exception.message ?: "An unexpected error occurred.",
+      path = request.requestURI,
+      details = arrayListOf(exception.localizedMessage)
+    )
+    return ResponseEntity(apiError, status)
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException::class)
+  @ResponseBody
+  fun handleMaxUploadSizeExceededException(exception: MaxUploadSizeExceededException, request: HttpServletRequest): ResponseEntity<ApiError> {
+    val status = HttpStatus.PAYLOAD_TOO_LARGE
+    val apiError = ApiError(
+      status = status.value(),
+      error = status.reasonPhrase,
+      message = "The uploaded file exceeds the maximum allowed size of 5MB.",
       path = request.requestURI,
       details = arrayListOf(exception.localizedMessage)
     )

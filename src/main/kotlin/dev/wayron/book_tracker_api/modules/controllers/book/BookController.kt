@@ -5,15 +5,13 @@ import dev.wayron.book_tracker_api.modules.models.book.BookPatch
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.services.book.BookService
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -26,7 +24,6 @@ class BookController(private val service: BookService) {
   @PostMapping
   fun createBook(
     @RequestBody @Valid book: BookRequest,
-    //@RequestPart("cover", required = false) coverFile: MultipartFile?
   ): ResponseEntity<BookResponse> {
     val response = service.createBook(book)
     return ResponseEntity(response, HttpStatus.CREATED)
@@ -59,6 +56,12 @@ class BookController(private val service: BookService) {
   @DeleteMapping("/{id}")
   fun deleteBook(@PathVariable id: Int): ResponseEntity<Unit> {
     service.deleteBook(id)
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+  }
+
+  @PostMapping("/{id}/covers", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+  fun uploadCover(@PathVariable id: Int, @RequestPart("covers") coverFile: MultipartFile): ResponseEntity<Unit> {
+    service.uploadCover(id, coverFile)
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
   }
 }

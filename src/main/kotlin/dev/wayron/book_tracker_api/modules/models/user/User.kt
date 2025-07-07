@@ -15,7 +15,7 @@ data class User(
   val id: String = Base62UUIDGenerator.generate(),
 
   val isActive: Boolean = true,
-  val profileImage: String? = null,
+  var profileImagePath: String? = null,
 
   val email: String,
 
@@ -29,7 +29,7 @@ data class User(
   val role: Role = Role.USER,
 
   val createdAt: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-  val updatedAt: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+  var updatedAt: LocalDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
 ): UserDetails {
   override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
     return mutableListOf(SimpleGrantedAuthority("ROLE_${role.name}"))

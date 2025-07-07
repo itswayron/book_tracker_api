@@ -9,4 +9,9 @@ enum class ValidationErrorMessages(val message: String) {
   NEGATIVE_DAILY_GOAL("Cannot have a negative daily goal."),
   FUTURE_START_READING("Cannot start reading a book in the future."),
   FUTURE_END_READING("Cannot finish a book on the future."),
+  IMAGE_EMPTY("File does not exists."),
+  NOT_IMAGE("The file is not an image."),
+  BIG_FILE("The file is too big"),
+  SMALL_DIMENSIONS("The image dimensions are too small."),
+  UNSUPPORTED_IMAGE("Unsupported image format or unable to read image."),
 }

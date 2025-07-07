@@ -1,0 +1,1 @@
+ALTER TABLE users RENAME COLUMN profile_image to profile_image_path;
