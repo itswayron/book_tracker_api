@@ -8,6 +8,7 @@ enum class ValidationErrorMessages(val message: String) {
   BOOK_HAS_NO_CHAPTERS("Cannot track by chapters if the book has no chapters."),
   NEGATIVE_DAILY_GOAL("Cannot have a negative daily goal."),
   FUTURE_START_READING("Cannot start reading a book in the future."),
+  INVALID_ESTIMATED_COMPLETION_DATE("Estimated completion date is before start reading date."),
   FUTURE_END_READING("Cannot finish a book on the future."),
   IMAGE_EMPTY("File does not exists."),
   NOT_IMAGE("The file is not an image."),

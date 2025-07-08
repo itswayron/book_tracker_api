@@ -21,6 +21,7 @@ class ReadingSessionValidator : Validator<ReadingSession> {
     validateTracking(t.chapters, t.trackingMethod, errors)
     validateDailyGoal(t.dailyGoal, errors)
     validateStartReadingDate(t.startReadingDate, errors)
+    validateEstimatedCompletionDate(t, errors)
     validateEndReadingDate(t.endReadingDate, errors)
 
     if (errors.isNotEmpty()) {
@@ -68,6 +69,16 @@ class ReadingSessionValidator : Validator<ReadingSession> {
       errors.add(ValidationErrorMessages.FUTURE_START_READING.message)
     } else {
       logger.debug("Valid start date.")
+    }
+  }
+
+  private fun validateEstimatedCompletionDate(session: ReadingSession, errors: MutableList<String>) {
+    logger.debug("Validating session estimated completion date: {}", session.estimatedCompletionDate)
+    if(session.estimatedCompletionDate != null && session.startReadingDate.isAfter(session.estimatedCompletionDate)) {
+      logger.error("Invalid completion date.")
+      errors.add(ValidationErrorMessages.INVALID_ESTIMATED_COMPLETION_DATE.message)
+    } else {
+      logger.debug("Valid estimated completion date.")
     }
   }
 

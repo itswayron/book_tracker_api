@@ -94,5 +94,15 @@ class ReadingSessionValidatorTest {
 
   }
 
+  @Test
+  fun `should throw exception when start date is after estimated completion date`() {
+    val invalidSession = session.copy(
+      startReadingDate = LocalDateTime.of(2024, 1, 10, 0, 0),
+      estimatedCompletionDate = LocalDateTime.of(2024, 1, 5, 0, 0)
+    )
 
+    val exception = assertThrows<ReadingSessionNotValidException> { validator.validate(invalidSession) }
+
+    assertTrue(exception.errors.contains(ValidationErrorMessages.INVALID_ESTIMATED_COMPLETION_DATE.message))
+  }
 }
