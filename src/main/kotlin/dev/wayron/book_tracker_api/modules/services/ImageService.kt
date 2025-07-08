@@ -14,10 +14,10 @@ import javax.imageio.ImageIO
 
 @Service
 class ImageService(
-  private val validator: Validator<MultipartFile>
+  private val validator: Validator<MultipartFile>,
+  private val baseDir: Path = Paths.get("uploads/images"),
 ) {
   private val logger = LoggerFactory.getLogger(this::class.java)
-  private val baseDir = Paths.get("uploads/images")
 
   init {
     logger.info("Initializing ImageService and creating necessary directories.")
