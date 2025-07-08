@@ -4,53 +4,66 @@ import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
+import dev.wayron.book_tracker_api.modules.models.book.BookPatch
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
-import dev.wayron.book_tracker_api.modules.models.mappers.BookMapper
+import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
+import dev.wayron.book_tracker_api.modules.services.ImageService
 import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validators.Validator
-import dev.wayron.book_tracker_api.modules.validators.book.BookValidator
-import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
-import dev.wayron.book_tracker_api.modules.models.user.User
+import jakarta.persistence.EntityNotFoundException
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.ArgumentMatchers.any
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentCaptor
+import org.mockito.BDDMockito.given
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.*
+import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.multipart.MultipartFile
 import java.sql.Timestamp
 import java.util.*
 import kotlin.test.assertEquals
 
+@ExtendWith(MockitoExtension::class)
 class BookServiceTest {
 
   @Mock
-  private val repository: BookRepository = mock(BookRepository::class.java)
+  lateinit var repository: BookRepository
 
   @Mock
-  private val validator: Validator<Book> = mock(BookValidator::class.java)
+  lateinit var validator: Validator<Book>
 
   @Mock
-  private val userRepository: UserRepository = mock(UserRepository::class.java)
+  lateinit var userRepository: UserRepository
 
   @Mock
-  private val mapper : BookMapper = mock(BookMapper::class.java)
-
-  @Mock
-  private val userValidator: UserAccessValidator = mock(UserAccessValidator::class.java)
+  lateinit var imageService: ImageService
 
   @InjectMocks
-  private val service = BookService(repository, validator, userRepository, userValidator, mapper)
+  lateinit var service: BookService
 
   private lateinit var book: Book
   private lateinit var user: User
   private lateinit var bookRequest: BookRequest
   private lateinit var bookResponse: BookResponse
+  private lateinit var bookPatch: BookPatch
+
+  fun <T> any(): T = Mockito.any<T>() ?: uninitialized()
+
+  @Suppress("UNCHECKED_CAST")
+  fun <T> uninitialized(): T = null as T
 
   @BeforeEach
   fun setUp() {
@@ -90,10 +103,23 @@ class BookServiceTest {
       pages = book.pages,
       chapters = book.chapters,
     )
+    bookPatch = BookPatch(
+      title = book.title,
+      author = book.author,
+      pages = book.pages,
+      chapters = book.chapters,
+    )
+  }
+
+  @BeforeEach
+  fun setupSecurityContext() {
+    val authentication = UsernamePasswordAuthenticationToken("Example user", null, emptyList())
+    SecurityContextHolder.getContext().authentication = authentication
   }
 
   @Test
   fun `should successfully create a new book`() {
+    `when`(userRepository.findByUsernameField("Example user")).thenReturn(user)
     `when`(repository.save(any<Book>())).thenReturn(book)
 
     val result = service.createBook(bookRequest)
@@ -106,16 +132,22 @@ class BookServiceTest {
 
   @Test
   fun `should throw exception for invalid book creation`() {
-    val invalidBook = book.copy(title = "")
+    book.copy(title = "")
     val invalidBookRequest = bookRequest.copy(title = "")
-    doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message))).`when`(validator)
-      .validate(invalidBook)
 
-    val exception = assertThrows<BookNotValidException> { service.createBook(invalidBookRequest) }
+    `when`(userRepository.findByUsernameField("Example user")).thenReturn(user)
+
+    doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message)))
+      .`when`(validator).validate(any())
+
+    val exception = assertThrows<BookNotValidException> {
+      service.createBook(invalidBookRequest)
+    }
 
     assertEquals(ExceptionErrorMessages.BOOK_NOT_VALID.message, exception.message)
-    verify(repository, never()).save(invalidBook)
+    verify(repository, never()).save(any<Book>())
   }
+
 
   @Test
   fun `should return a list of books successfully`() {
@@ -162,7 +194,7 @@ class BookServiceTest {
       pages = 200,
       chapters = 10,
     )
-    val bookUpdatedRequest = bookRequest.copy(
+    val bookUpdatedRequest = bookPatch.copy(
       title = "New Title",
       author = "New Author",
       pages = 200,
@@ -170,7 +202,9 @@ class BookServiceTest {
     )
     val command = Pair(1, bookUpdatedRequest)
 
+    `when`(repository.findById(1)).thenReturn(Optional.of(book))
     `when`(repository.save(any<Book>())).thenReturn(bookUpdated)
+
     val result = service.updateBook(command)
 
     assert(result.title == "New Title")
@@ -183,18 +217,24 @@ class BookServiceTest {
 
   @Test
   fun `should throw exception for invalid book update`() {
-    val invalidBook = book.copy(title = "")
-    val invalidBookRequest = bookRequest.copy(title = "")
-    doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message))).`when`(validator)
-      .validate(invalidBook)
+    val invalidBookRequest = bookPatch.copy(title = "")
+    val bookFound = book.copy(title = "Valid title")
+
+    given(repository.findById(book.id)).willReturn(Optional.of(bookFound))
+
+    doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message)))
+      .`when`(validator).validate(any())
+
     val command = Pair(1, invalidBookRequest)
 
-    val exception = assertThrows<BookNotValidException> { service.updateBook(command) }
+    val exception = assertThrows<BookNotValidException> {
+      service.updateBook(command)
+    }
 
     assertEquals(ExceptionErrorMessages.BOOK_NOT_VALID.message, exception.message)
     assert(exception.errors.contains(ValidationErrorMessages.EMPTY_TITLE.message))
 
-    verify(repository, never()).save(any<Book>())
+    verify(repository, never()).save(any())
   }
 
   @Test
@@ -216,5 +256,88 @@ class BookServiceTest {
 
     assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
     verify(repository, never()).deleteById(anyInt())
+  }
+
+  @Test
+  fun `should upload cover and delete old image when coverPath is not null`() {
+    val bookWithOldCover = book.copy(coverPath = "old/path/to/cover.jpg")
+
+    `when`(repository.findById(book.id)).thenReturn(Optional.of(bookWithOldCover))
+
+    val newImagePath = "new/path/to/cover.jpg"
+    `when`(imageService.saveImage(any(), any(), any())).thenReturn(newImagePath)
+
+    val coverFile = mock(MultipartFile::class.java)
+    service.uploadCover(book.id, coverFile)
+
+    verify(imageService, times(1)).deleteImage("old/path/to/cover.jpg")
+
+    val captor = ArgumentCaptor.forClass(Book::class.java)
+    verify(repository).save(captor.capture())
+
+    val savedBook = captor.value
+    assertEquals(newImagePath, savedBook.coverPath)
+  }
+
+  @Test
+  fun `should upload cover and not delete old image when coverPath is null`() {
+    val bookWithoutCover = book.copy(coverPath = null)
+
+    `when`(repository.findById(book.id)).thenReturn(Optional.of(bookWithoutCover))
+
+    val newImagePath = "new/path/to/cover.jpg"
+    `when`(imageService.saveImage(any(), any(), any())).thenReturn(newImagePath)
+
+    val coverFile = mock(MultipartFile::class.java)
+    service.uploadCover(book.id, coverFile)
+
+    verify(imageService, never()).deleteImage(anyString())
+
+    verify(imageService, times(1)).saveImage(any(), any(), any())
+
+    val captor = ArgumentCaptor.forClass(Book::class.java)
+    verify(repository).save(captor.capture())
+
+    val savedBook = captor.value
+    assertEquals(newImagePath, savedBook.coverPath)
+    assert(savedBook.updatedAt.time >= savedBook.createdAt.time)
+  }
+
+  @Test
+  fun `should upload cover and continue if deleting old image throws exception`() {
+    val bookWithOldCover = book.copy(coverPath = "old/path/to/cover.jpg")
+    `when`(repository.findById(book.id)).thenReturn(Optional.of(bookWithOldCover))
+
+    doThrow(RuntimeException("Failed to delete image")).`when`(imageService).deleteImage("old/path/to/cover.jpg")
+
+    val newImagePath = "new/path/to/cover.jpg"
+    `when`(imageService.saveImage(any(), any(), any())).thenReturn(newImagePath)
+
+    val coverFile = mock(MultipartFile::class.java)
+
+    service.uploadCover(book.id, coverFile)
+
+    verify(imageService, times(1)).deleteImage("old/path/to/cover.jpg")
+
+    verify(imageService, times(1)).saveImage(any(), any(), any())
+
+    val captor = ArgumentCaptor.forClass(Book::class.java)
+    verify(repository).save(captor.capture())
+    assertEquals(newImagePath, captor.value.coverPath)
+  }
+
+  @Test
+  fun `should throw BookNotFoundException when book not found during cover upload`() {
+    val invalidBookId = 999
+
+    `when`(repository.findById(invalidBookId)).thenReturn(Optional.empty())
+
+    val coverFile = mock(MultipartFile::class.java)
+
+    val exception = assertThrows<EntityNotFoundException> {
+      service.uploadCover(invalidBookId, coverFile)
+    }
+
+    assertTrue(exception.message?.contains("Book with id: $invalidBookId does not exist.") == true)
   }
 }

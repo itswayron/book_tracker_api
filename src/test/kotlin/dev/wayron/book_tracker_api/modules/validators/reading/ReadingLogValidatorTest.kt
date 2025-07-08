@@ -45,7 +45,6 @@ class ReadingLogValidatorTest {
       readingSession = session,
       dateOfReading = LocalDateTime.now(),
       quantityRead = 10,
-      userId = user,
     )
   }
 
@@ -67,6 +66,4 @@ class ReadingLogValidatorTest {
   fun `should not throw exception when log is valid`() {
     assertDoesNotThrow { validator.validate(log) }
   }
-
-
 }

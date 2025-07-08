@@ -1,35 +1,38 @@
 package dev.wayron.book_tracker_api.modules.services.reading
 
 import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
-import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
-import dev.wayron.book_tracker_api.modules.models.book.BookRequest
-import dev.wayron.book_tracker_api.modules.models.book.BookResponse
-import dev.wayron.book_tracker_api.modules.models.mappers.ReadingMapper
+import dev.wayron.book_tracker_api.modules.models.mappers.toResponse
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingLog
 import dev.wayron.book_tracker_api.modules.models.reading.ReadingSession
 import dev.wayron.book_tracker_api.modules.models.reading.dto.ReadingSessionRequest
 import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
+import dev.wayron.book_tracker_api.modules.models.user.User
+import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
+import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.services.book.BookService
 import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingLogValidator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingSessionValidator
-import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
-import dev.wayron.book_tracker_api.modules.models.user.User
-import dev.wayron.book_tracker_api.utils.Mappers
+import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.InjectMocks
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.mockito.MockitoAnnotations
+import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -37,54 +40,44 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@ExtendWith(MockitoExtension::class)
 class ReadingServiceTest {
   @Mock
-  private val sessionRepository: ReadingSessionRepository = mock(ReadingSessionRepository::class.java)
+  lateinit var sessionRepository: ReadingSessionRepository
 
   @Mock
-  private val logRepository: ReadingLogRepository = mock(ReadingLogRepository::class.java)
+  lateinit var logRepository: ReadingLogRepository
 
   @Mock
-  private val bookService: BookService = mock(BookService::class.java)
+  lateinit var bookRepository: BookRepository
 
   @Mock
-  private val logValidator: Validator<ReadingLog> = ReadingLogValidator()
+  lateinit var bookService: BookService
 
   @Mock
-  private val readingValidator: Validator<ReadingSession> = ReadingSessionValidator()
+  lateinit var userRepository: UserRepository
 
-  @Mock
-  private val mapper: ReadingMapper = mock(ReadingMapper::class.java)
-
-  @Mock
-  private val userRepository: UserRepository = mock(UserRepository::class.java)
-
-  @Mock
-  private val userAccessValidator: UserAccessValidator = mock(UserAccessValidator::class.java)
-
-  @InjectMocks
-  private val readingService =
-    ReadingService(
-      sessionRepository,
-      logRepository,
-      bookService,
-      logValidator,
-      readingValidator,
-      mapper,
-      userRepository,
-      userAccessValidator,
-    )
+  lateinit var readingService: ReadingService
 
   private lateinit var book: Book
   private lateinit var reading: ReadingSession
   private lateinit var readingRequest: ReadingSessionRequest
   private lateinit var readingLog: ReadingLog
   private lateinit var user: User
-  private lateinit var bookRequest: BookRequest
-  private lateinit var bookResponse: BookResponse
 
   @BeforeEach
   fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    val logValidator: Validator<ReadingLog> = ReadingLogValidator()
+    val readingValidator: Validator<ReadingSession> = ReadingSessionValidator()
+    readingService = ReadingService(
+      sessionRepository = sessionRepository,
+      logRepository = logRepository,
+      bookRepository = bookRepository,
+      logValidator = logValidator,
+      readingValidator = readingValidator,
+      userRepository = userRepository,
+    )
     user = User(
       usernameField = "Example user",
       email = "Example email",
@@ -124,7 +117,6 @@ class ReadingServiceTest {
       userId = user
     )
     readingRequest = ReadingSessionRequest(
-      bookId = book.id,
       trackingMethod = reading.trackingMethod,
       dailyGoal = reading.dailyGoal,
       startReadingDate = reading.startReadingDate,
@@ -134,18 +126,24 @@ class ReadingServiceTest {
       id = 0,
       readingSession = reading,
       quantityRead = 10,
-      userId = user
     )
-    `when`(bookService.getBookById(book.id)).thenReturn(book)
+    lenient().`when`(bookRepository.findById(1)).thenReturn(Optional.of(book))
+    lenient().`when`(bookService.getBookById(book.id)).thenReturn(book.toResponse())
+  }
+
+  @BeforeEach
+  fun setupSecurityContext() {
+    lenient().`when`(userRepository.findByUsernameField("Example user")).thenReturn(user)
+    val authentication = UsernamePasswordAuthenticationToken("Example user", null, emptyList())
+    SecurityContextHolder.getContext().authentication = authentication
   }
 
   @Test
   fun `should successfully create a reading session`() {
-
     val savedSession = reading.copy(id = 1)
-    `when`(sessionRepository.save(any<ReadingSession>())).thenReturn(savedSession)
+    `when`(sessionRepository.save(any())).thenReturn(savedSession)
 
-    val result = readingService.createReadingSession(readingRequest)
+    val result = readingService.createReadingSession(readingRequest, 1)
 
     assertNotNull(result)
     assertEquals(reading.book.id, result.bookId)
@@ -156,20 +154,20 @@ class ReadingServiceTest {
     assertEquals(reading.pages, result.pages)
     assertEquals(reading.chapters, result.chapters)
 
-    verify(sessionRepository, times(1)).save(any<ReadingSession>())
+    verify(sessionRepository, times(1)).save(any())
   }
 
   @Test
   fun `should throw exception for invalid reading session creation`() {
 
-    val invalidSession = reading.copy(
+    val invalidSession = readingRequest.copy(
       trackingMethod = TrackingMethod.CHAPTERS,
       dailyGoal = -1,
       startReadingDate = LocalDateTime.now().plusDays(1),
     )
 
     val exception = assertThrows<ReadingSessionNotValidException> {
-      readingService.createReadingSession(Mappers.mapReadingSessionToRequest(invalidSession))
+      readingService.createReadingSession(invalidSession, 1)
     }
 
     val expectedErrors = listOf(
@@ -181,20 +179,20 @@ class ReadingServiceTest {
     assertEquals(expectedErrors, exception.errors)
     assertEquals(ExceptionErrorMessages.READING_NOT_VALID.message, exception.message)
 
-    verify(sessionRepository, never()).save(any<ReadingSession>())
+    verify(sessionRepository, never()).save(any())
   }
 
   @Test
   fun `should throw exception for non-existing book during reading creation`() {
-    val readingInvalid = reading.copy(book = book.copy(id = 99))
-    `when`(bookService.getBookById(readingInvalid.book.id)).thenThrow(BookNotFoundException())
+    val readingInvalid = readingRequest.copy()
+    `when`(bookRepository.findById(99)).thenReturn(Optional.empty())
 
-    val exception = assertThrows<BookNotFoundException> {
-      readingService.createReadingSession(Mappers.mapReadingSessionToRequest(readingInvalid))
+    val exception = assertThrows<EntityNotFoundException> {
+      readingService.createReadingSession(readingInvalid, 99)
     }
 
-    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
-    verify(sessionRepository, never()).save(any<ReadingSession>())
+    assertEquals("Book with id: 99 does not exist.", exception.message)
+    verify(sessionRepository, never()).save(any())
   }
 
   @Test
@@ -226,7 +224,6 @@ class ReadingServiceTest {
   @Test
   fun `should return list of readings for a valid book id`() {
     val readings = listOf(reading, reading.copy(), reading.copy())
-    `when`(sessionRepository.findById(1)).thenReturn(Optional.of(reading))
     `when`(sessionRepository.findByBookId(book.id)).thenReturn(readings)
 
     val result = readingService.getReadingSessionsByBookId(book.id)
@@ -247,19 +244,22 @@ class ReadingServiceTest {
 
   @Test
   fun `should throw exception for invalid book id during reading search`() {
-    `when`(bookService.getBookById(99)).thenThrow(BookNotFoundException())
+    `when`(bookRepository.findById(99)).thenReturn(Optional.empty())
 
-    val exception = assertThrows<BookNotFoundException> { readingService.getReadingSessionsByBookId(99) }
+    val exception = assertThrows<EntityNotFoundException> {
+      readingService.getReadingSessionsByBookId(99)
+    }
 
-    assertEquals(ExceptionErrorMessages.BOOK_NOT_FOUND.message, exception.apiMessage)
-    verify(sessionRepository, never()).save(any<ReadingSession>())
+    assertEquals("Book with id: 99 does not exist.", exception.message)
+    verify(sessionRepository, never()).save(any())
   }
+
 
   @Test
   fun `should successfully add a reading log`() {
     `when`(sessionRepository.findById(reading.id)).thenReturn(Optional.of(reading))
-    `when`(logRepository.save(any<ReadingLog>())).thenReturn(readingLog)
-    `when`(sessionRepository.save(any<ReadingSession>())).thenReturn(reading)
+    `when`(logRepository.save(any())).thenReturn(readingLog)
+    `when`(sessionRepository.save(any())).thenReturn(reading)
 
     val result = readingService.addReading(readingLog.readingSession.id, readingLog.quantityRead)
 
@@ -269,8 +269,8 @@ class ReadingServiceTest {
     assertEquals(readingLog.readingSession.id, result.readingSessionId)
 
     verify(sessionRepository, times(1)).findById(reading.id)
-    verify(logRepository, times(1)).save(any<ReadingLog>())
-    verify(sessionRepository, times(1)).save(any<ReadingSession>())
+    verify(logRepository, times(1)).save(any())
+    verify(sessionRepository, times(1)).save(any())
   }
 
   @Test
@@ -300,5 +300,33 @@ class ReadingServiceTest {
     assert(exception.message == ExceptionErrorMessages.READING_NOT_FOUND.message)
     verify(spyReadingService, times(1)).getReadingSessionById(99)
     verify(logRepository, times(0)).save(readingLog)
+  }
+
+  @Test
+  fun `should delete reading session successfully`() {
+    val readingId = 1
+    val readingSession = reading.copy(id = readingId)
+
+    `when`(sessionRepository.findById(readingId)).thenReturn(Optional.of(readingSession))
+
+    readingService.deleteReadingById(readingId)
+
+    verify(sessionRepository, times(1)).findById(readingId)
+    verify(sessionRepository, times(1)).deleteById(readingId)
+  }
+
+  @Test
+  fun `should throw exception when reading session not found`() {
+    val readingId = 99
+
+    `when`(sessionRepository.findById(readingId)).thenReturn(Optional.empty())
+
+    val exception = assertThrows<EntityNotFoundException> {
+      readingService.deleteReadingById(readingId)
+    }
+
+    assertEquals("ReadingSession with id: $readingId does not exist.", exception.message)
+    verify(sessionRepository, times(1)).findById(readingId)
+    verify(sessionRepository, never()).deleteById(any())
   }
 }
