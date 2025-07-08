@@ -1,6 +1,7 @@
 package dev.wayron.book_tracker_api.modules.services.book
 
 import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
+import dev.wayron.book_tracker_api.modules.exceptions.ExceptionProvider
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.models.book.Book
@@ -13,8 +14,7 @@ import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.services.ImageService
 import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validators.Validator
-import jakarta.persistence.EntityNotFoundException
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.multipart.MultipartFile
@@ -330,14 +331,27 @@ class BookServiceTest {
   fun `should throw BookNotFoundException when book not found during cover upload`() {
     val invalidBookId = 999
 
+    val repository = mock(BookRepository::class.java, withSettings().extraInterfaces(ExceptionProvider::class.java))
+
     `when`(repository.findById(invalidBookId)).thenReturn(Optional.empty())
+
+    `when`((repository as ExceptionProvider<Int>).notFoundException(invalidBookId))
+      .thenReturn(BookNotFoundException(invalidBookId))
+
+    @Suppress("UNCHECKED_CAST")
+    val validator = mock(Validator::class.java) as Validator<Book>
+    val userRepository = mock(UserRepository::class.java)
+    val imageService = mock(ImageService::class.java)
+
+    val service = BookService(repository, validator, userRepository, imageService)
 
     val coverFile = mock(MultipartFile::class.java)
 
-    val exception = assertThrows<EntityNotFoundException> {
+    val exception = assertThrows(BookNotFoundException::class.java) {
       service.uploadCover(invalidBookId, coverFile)
     }
 
-    assertTrue(exception.message?.contains("Book with id: $invalidBookId does not exist.") == true)
+    assertEquals("Book ID=$invalidBookId not found.", exception.apiMessage)
+    assertEquals(HttpStatus.NOT_FOUND, exception.status)
   }
 }

@@ -19,12 +19,11 @@ class ReadingLogValidator : Validator<ReadingLog> {
   }
 
   fun validateQuantityRead(quantityRead: Int) {
-    logger.info("Validating quantity read.")
+    logger.debug("Validating quantity read.")
     if (quantityRead <= 0) {
       logger.error("Quantity read not valid.")
       throw InvalidReadingLogException()
     }
-    logger.info("Valid quantity read.")
+    logger.debug("Valid quantity read.")
   }
-
 }

@@ -1,6 +1,9 @@
 package dev.wayron.book_tracker_api.modules.services.reading
 
+import dev.wayron.book_tracker_api.modules.exceptions.ApiException
 import dev.wayron.book_tracker_api.modules.exceptions.ExceptionErrorMessages
+import dev.wayron.book_tracker_api.modules.exceptions.ExceptionProvider
+import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.InvalidReadingLogException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.ReadingSessionNotValidException
@@ -13,7 +16,6 @@ import dev.wayron.book_tracker_api.modules.models.reading.enums.ReadingState
 import dev.wayron.book_tracker_api.modules.models.reading.enums.TrackingMethod
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
-import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingLogRepository
 import dev.wayron.book_tracker_api.modules.repositories.reading.ReadingSessionRepository
 import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
@@ -23,6 +25,7 @@ import dev.wayron.book_tracker_api.modules.validators.Validator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingLogValidator
 import dev.wayron.book_tracker_api.modules.validators.reading.ReadingSessionValidator
 import jakarta.persistence.EntityNotFoundException
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -184,16 +187,42 @@ class ReadingServiceTest {
 
   @Test
   fun `should throw exception for non-existing book during reading creation`() {
-    val readingInvalid = readingRequest.copy()
-    `when`(bookRepository.findById(99)).thenReturn(Optional.empty())
+    val invalidBookId = 99
 
-    val exception = assertThrows<EntityNotFoundException> {
-      readingService.createReadingSession(readingInvalid, 99)
+    val bookRepository = mock(BookRepository::class.java, withSettings().extraInterfaces(ExceptionProvider::class.java))
+    `when`(bookRepository.findById(invalidBookId)).thenReturn(Optional.empty())
+    `when`((bookRepository as ExceptionProvider<Int>).notFoundException(invalidBookId))
+      .thenReturn(BookNotFoundException(invalidBookId))
+
+    val sessionRepository = mock(ReadingSessionRepository::class.java)
+    val logRepository = mock(ReadingLogRepository::class.java)
+
+    @Suppress("UNCHECKED_CAST")
+    val logValidator = mock(Validator::class.java) as Validator<ReadingLog>
+
+    @Suppress("UNCHECKED_CAST")
+    val readingValidator = mock(Validator::class.java) as Validator<ReadingSession>
+    val userRepository = mock(UserRepository::class.java)
+
+    val readingService = ReadingService(
+      sessionRepository,
+      logRepository,
+      bookRepository,
+      logValidator,
+      readingValidator,
+      userRepository
+    )
+
+    val readingInvalid = readingRequest.copy()
+
+    val exception = assertThrows(BookNotFoundException::class.java) {
+      readingService.createReadingSession(readingInvalid, invalidBookId)
     }
 
-    assertEquals("Book with id: 99 does not exist.", exception.message)
+    assertEquals("Book ID=$invalidBookId not found.", (exception as BookNotFoundException).apiMessage)
     verify(sessionRepository, never()).save(any())
   }
+
 
   @Test
   fun `should return the correct reading session by id`() {
@@ -244,13 +273,37 @@ class ReadingServiceTest {
 
   @Test
   fun `should throw exception for invalid book id during reading search`() {
-    `when`(bookRepository.findById(99)).thenReturn(Optional.empty())
+    val invalidBookId = 99
 
-    val exception = assertThrows<EntityNotFoundException> {
-      readingService.getReadingSessionsByBookId(99)
+    val bookRepository = mock(BookRepository::class.java, withSettings().extraInterfaces(ExceptionProvider::class.java))
+    `when`(bookRepository.findById(invalidBookId)).thenReturn(Optional.empty())
+    `when`((bookRepository as ExceptionProvider<Int>).notFoundException(invalidBookId))
+      .thenReturn(BookNotFoundException(invalidBookId))
+
+    val sessionRepository = mock(ReadingSessionRepository::class.java)
+    val logRepository = mock(ReadingLogRepository::class.java)
+
+    @Suppress("UNCHECKED_CAST")
+    val logValidator = mock(Validator::class.java) as Validator<ReadingLog>
+
+    @Suppress("UNCHECKED_CAST")
+    val readingValidator = mock(Validator::class.java) as Validator<ReadingSession>
+    val userRepository = mock(UserRepository::class.java)
+
+    val readingService = ReadingService(
+      sessionRepository,
+      logRepository,
+      bookRepository,
+      logValidator,
+      readingValidator,
+      userRepository
+    )
+
+    val exception = assertThrows(BookNotFoundException::class.java) {
+      readingService.getReadingSessionsByBookId(invalidBookId)
     }
 
-    assertEquals("Book with id: 99 does not exist.", exception.message)
+    assertEquals("Book ID=$invalidBookId not found.", (exception as ApiException).apiMessage)
     verify(sessionRepository, never()).save(any())
   }
 
