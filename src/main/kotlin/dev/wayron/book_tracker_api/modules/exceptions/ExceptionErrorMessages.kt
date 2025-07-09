@@ -10,4 +10,5 @@ enum class ExceptionErrorMessages(val message: String, val details: String? = nu
   FORBIDDEN_ACCESS("The user don't have permission to perform this action."),
   INVALID_IMAGE("The image sent is not valid."),
   USER_NOT_FOUND("User not found."),
+  USER_NOT_VALID("User is not valid."),
 }

@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserRepository : JpaRepository<User, String>, UserRepositoryCustom {
   fun findByUsernameField(username: String): User?
+  fun existsByEmail(email: String) : Boolean
+  fun existsByUsernameField(username: String): Boolean
 }

@@ -3,6 +3,8 @@ package dev.wayron.book_tracker_api.modules.exceptions
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.book.BookNotValidException
 import dev.wayron.book_tracker_api.modules.exceptions.reading.*
+import dev.wayron.book_tracker_api.modules.exceptions.user.UserNotFoundException
+import dev.wayron.book_tracker_api.modules.exceptions.user.UserNotValidException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,6 +26,8 @@ class GlobalExceptionHandler {
     InvalidReadingLogException::class,
     ForbiddenActionException::class,
     ImageNotValidException::class,
+    UserNotValidException::class,
+    UserNotFoundException::class,
   )
   @ResponseBody
   fun handleCustomExceptions(exception: Exception, request: HttpServletRequest): ResponseEntity<ApiError> {
@@ -59,7 +63,10 @@ class GlobalExceptionHandler {
 
   @ExceptionHandler(MaxUploadSizeExceededException::class)
   @ResponseBody
-  fun handleMaxUploadSizeExceededException(exception: MaxUploadSizeExceededException, request: HttpServletRequest): ResponseEntity<ApiError> {
+  fun handleMaxUploadSizeExceededException(
+    exception: MaxUploadSizeExceededException,
+    request: HttpServletRequest
+  ): ResponseEntity<ApiError> {
     val status = HttpStatus.PAYLOAD_TOO_LARGE
     val apiError = ApiError(
       status = status.value(),

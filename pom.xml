@@ -144,6 +144,14 @@
             <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.mockk/mockk -->
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk</artifactId>
+            <version>1.14.4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
