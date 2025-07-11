@@ -21,7 +21,8 @@ class UserRequestValidatorTest {
     val request = UserRequest(
       username = "wayron_dev",
       email = "wayron@example.com",
-      password = "Strong@123"
+      password = "Strong@123",
+      name = "John Doe"
     )
 
     assertDoesNotThrow {
@@ -33,6 +34,7 @@ class UserRequestValidatorTest {
   fun `should fail for blank email`() {
     val request = UserRequest(
       username = "wayron",
+      name = "John doe",
       email = "",
       password = "Strong@123"
     )
@@ -48,6 +50,7 @@ class UserRequestValidatorTest {
   fun `should fail for invalid email`() {
     val request = UserRequest(
       username = "wayron",
+      name = "John doe",
       email = "invalid-email",
       password = "Strong@123"
     )
@@ -63,6 +66,7 @@ class UserRequestValidatorTest {
   fun `should fail for blank username`() {
     val request = UserRequest(
       username = "",
+      name = "John doe",
       email = "wayron@email.com",
       password = "Strong@123"
     )
@@ -78,6 +82,7 @@ class UserRequestValidatorTest {
   fun `should fail for short username and invalid characters`() {
     val request = UserRequest(
       username = "a!",
+      name = "John doe",
       email = "valid@email.com",
       password = "Strong@123"
     )
@@ -94,6 +99,7 @@ class UserRequestValidatorTest {
   fun `should fail for weak password`() {
     val request = UserRequest(
       username = "wayron",
+      name = "John doe",
       email = "wayron@email.com",
       password = "abc"
     )
@@ -112,6 +118,7 @@ class UserRequestValidatorTest {
   fun `should fail for password with no special character`() {
     val request = UserRequest(
       username = "wayron",
+      name = "John doe",
       email = "wayron@email.com",
       password = "Password1"
     )

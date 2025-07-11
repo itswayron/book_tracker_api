@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 data class UserResponse(
   val id: String,
   val username: String,
+  val name: String? = null,
   val email: String,
   val imageProfilePath: String? = null,
   val createdAt: LocalDateTime

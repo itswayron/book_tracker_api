@@ -22,6 +22,7 @@ class ReadingLogValidatorTest {
     user = User(
       usernameField = "Example user",
       email = "Example email",
+      name = "john doe",
       passwordField = "A very secure password"
     )
     val book = Book(

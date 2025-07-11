@@ -34,11 +34,12 @@ class UploadUserProfileImageServiceTest {
     user = User(
       id = "123",
       usernameField = "wayron",
+      name = "john_doe",
       email = "wayron@example.com",
       passwordField = "hashed_password",
       profileImagePath = null,
       createdAt = LocalDateTime.now(),
-      updatedAt = LocalDateTime.now()
+      updatedAt = LocalDateTime.now(),
     )
 
     val auth = mock(Authentication::class.java)

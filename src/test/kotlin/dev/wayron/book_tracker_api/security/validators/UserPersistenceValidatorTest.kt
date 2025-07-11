@@ -19,7 +19,8 @@ class UserPersistenceValidatorTest {
     id = "A001",
     usernameField = "wayron",
     email = "wayron@example.com",
-    passwordField = "Strong@123"
+    passwordField = "Strong@123",
+    name = "john doe"
   )
 
   @BeforeEach

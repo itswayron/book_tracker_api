@@ -24,6 +24,7 @@ class ReadingSessionValidatorTest {
     user = User(
       usernameField = "Example user",
       email = "Example email",
+      name = "John Doe",
       passwordField = "A very secure password"
     )
     validator = ReadingSessionValidator()

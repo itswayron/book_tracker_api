@@ -69,7 +69,8 @@ class BookServiceTest {
   @BeforeEach
   fun setUp() {
     user = User(
-      usernameField = "Example user",
+      usernameField = "john_doe",
+      name = "John Doe",
       email = "Example email",
       passwordField = "A very secure password"
     )

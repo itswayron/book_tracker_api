@@ -27,6 +27,7 @@ class UserServiceTest {
   private val request = UserRequest(
     username = "  wayron  ",
     email = "  wayron@example.com  ",
+    name = "John doe",
     password = "Strong@123"
   )
 
@@ -36,6 +37,7 @@ class UserServiceTest {
     id = "1",
     usernameField = "wayron",
     email = "wayron@example.com",
+    name = "John doe",
     passwordField = encodedPassword,
     createdAt = LocalDateTime.now()
   )
@@ -62,6 +64,7 @@ class UserServiceTest {
     val expectedUser = User(
       usernameField = sanitizedRequest.username,
       email = sanitizedRequest.email,
+      name = "John doe",
       passwordField = encodedPassword
     )
 

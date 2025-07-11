@@ -34,6 +34,7 @@ class UserService(
 
     val user = User(
       usernameField = sanitizedRequest.username,
+      name = sanitizedRequest.name,
       email = sanitizedRequest.email,
       passwordField = encoder.encode(sanitizedRequest.password)
     )
@@ -42,13 +43,7 @@ class UserService(
     repository.save(user)
 
     logger.info("User created with id: ${user.id}")
-    val response = UserResponse(
-      id = user.id,
-      username = user.usernameField,
-      email = user.email,
-      createdAt = user.createdAt,
-      imageProfilePath = user.profileImagePath,
-    )
+    val response = user.toResponse()
     return response
   }
 
@@ -56,19 +51,24 @@ class UserService(
     logger.info("Fetching user with id: $id")
     val user = repository.findById(id).orElseThrow()
     logger.info("Retrieved the book with ID: $id - Username: ${user.usernameField}")
-    val userResponse = UserResponse(
-      id = user.id,
-      username = user.usernameField,
-      email = user.email,
-      createdAt = user.createdAt,
-      imageProfilePath = user.profileImagePath,
-    )
+    val userResponse = user.toResponse()
     return userResponse
   }
 
   private fun UserRequest.sanitized(): UserRequest =
     this.copy(
       username = this.username.trim(),
+      name = this.name.trim(),
       email = this.email.trim()
+    )
+
+  private fun User.toResponse(): UserResponse =
+    UserResponse(
+      id = this.id,
+      username = this.usernameField,
+      name = this.name,
+      email = this.email,
+      createdAt = this.createdAt,
+      imageProfilePath = this.profileImagePath,
     )
 }

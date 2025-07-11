@@ -19,6 +19,8 @@ data class User(
 
   val email: String,
 
+  val name: String,
+
   @Column(name = "username")
   val usernameField: String,
 
