@@ -1,4 +1,6 @@
-/*import dev.wayron.book_tracker_api.modules.models.user.User
+package dev.wayron.book_tracker_api.security.services
+
+import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.services.EmailService
 import dev.wayron.book_tracker_api.modules.validators.Validator
@@ -8,7 +10,7 @@ import dev.wayron.book_tracker_api.security.models.password.ForgotPasswordReques
 import dev.wayron.book_tracker_api.security.models.password.PasswordResetToken
 import dev.wayron.book_tracker_api.security.models.password.ResetPasswordRequest
 import dev.wayron.book_tracker_api.security.repositories.PasswordResetTokenRepository
-import dev.wayron.book_tracker_api.security.services.PasswordResetService
+import io.mockk.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -38,7 +40,7 @@ class PasswordResetServiceTest {
 
   @BeforeEach
   fun setup() {
-    emailService = mockk(relaxed = true) // relaxed para não precisar mockar tudo
+    emailService = mockk(relaxed = true)
     userRepository = mockk()
     tokenRepository = mockk()
     passwordEncoder = mockk()
@@ -53,7 +55,7 @@ class PasswordResetServiceTest {
   fun `forgotPassword sends email and creates token when user exists`() {
     every { userRepository.findByEmail("john.doe@example.com") } returns user
     every { tokenRepository.deleteByUser(user) } just Runs
-    every { tokenRepository.save(any()) } just Runs
+    every { tokenRepository.save(any()) } returns mockk()
     every { emailService.sendPasswordResetEmail(any(), any()) } just Runs
 
     service.forgotPassword(ForgotPasswordRequest(email = "john.doe@example.com"))
@@ -84,7 +86,7 @@ class PasswordResetServiceTest {
     every { tokenRepository.findByToken(tokenString) } returns token
     every { passwordValidator.validate("newPassword123") } just Runs
     every { passwordEncoder.encode("newPassword123") } returns "hashedNewPassword"
-    every { userRepository.save(user) } just Runs
+    every { userRepository.save(user) } returns mockk()
     every { tokenRepository.deleteByUser(user) } just Runs
 
     val request = ResetPasswordRequest(token = tokenString, newPassword = "newPassword123")
@@ -127,4 +129,3 @@ class PasswordResetServiceTest {
     verify(exactly = 1) { tokenRepository.delete(expiredToken) }
   }
 }
-*/

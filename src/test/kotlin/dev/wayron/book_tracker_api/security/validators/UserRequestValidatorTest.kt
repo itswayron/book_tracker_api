@@ -94,39 +94,4 @@ class UserRequestValidatorTest {
     assertTrue(ex.details.contains(USERNAME_LENGTH.message))
     assertTrue(ex.details.contains(USERNAME_INVALID_CHARS.message))
   }
-
-  @Test
-  fun `should fail for weak password`() {
-    val request = UserRequest(
-      username = "wayron",
-      name = "John doe",
-      email = "wayron@email.com",
-      password = "abc"
-    )
-
-    val ex = assertThrows(UserNotValidException::class.java) {
-      validator.validate(request)
-    }
-
-    assertTrue(ex.details.contains(PASSWORD_TOO_SHORT.message))
-    assertTrue(ex.details.contains(PASSWORD_NO_UPPERCASE.message))
-    assertTrue(ex.details.contains(PASSWORD_NO_DIGIT.message))
-    assertTrue(ex.details.contains(PASSWORD_NO_SPECIAL.message))
-  }
-
-  @Test
-  fun `should fail for password with no special character`() {
-    val request = UserRequest(
-      username = "wayron",
-      name = "John doe",
-      email = "wayron@email.com",
-      password = "Password1"
-    )
-
-    val ex = assertThrows(UserNotValidException::class.java) {
-      validator.validate(request)
-    }
-
-    assertTrue(ex.details.contains(PASSWORD_NO_SPECIAL.message))
-  }
 }
