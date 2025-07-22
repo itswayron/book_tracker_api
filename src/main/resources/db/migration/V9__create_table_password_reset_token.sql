@@ -1,0 +1,9 @@
+CREATE TABLE password_reset_token(
+    id SERIAL PRIMARY KEY,
+    token TEXT NOT NULL UNIQUE,
+    user_id VARCHAR(22) NOT NULL UNIQUE,
+    expire_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+
+    CONSTRAINT fk_user FOREIGN KEY (user_id)
+    REFERENCES users(id) ON DELETE CASCADE
+);

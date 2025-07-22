@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service
 class UserService(
   private val repository: UserRepository,
   private val encoder: PasswordEncoder,
-  private val validator: Validator<UserRequest>,
+  private val userRequestValidator: Validator<UserRequest>,
   private val persistenceValidator: UserPersistenceValidator,
+  private val passwordValidator: Validator<String>
 ) : UserDetailsService {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -30,7 +31,8 @@ class UserService(
     val sanitizedRequest = request.sanitized()
     logger.info("Creating user with username: ${sanitizedRequest.username}")
 
-    validator.validate(sanitizedRequest)
+    userRequestValidator.validate(sanitizedRequest)
+    passwordValidator.validate(sanitizedRequest.password)
 
     val user = User(
       usernameField = sanitizedRequest.username,

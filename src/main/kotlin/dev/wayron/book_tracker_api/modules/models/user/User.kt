@@ -25,7 +25,7 @@ data class User(
   val usernameField: String,
 
   @Column(name = "password")
-  val passwordField: String,
+  var passwordField: String,
 
   @Enumerated(EnumType.STRING)
   val role: Role = Role.USER,

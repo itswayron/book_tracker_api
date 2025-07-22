@@ -16,7 +16,6 @@ class UserRequestValidator : Validator<UserRequest> {
     val errors = mutableListOf<String>()
     validateUserEmail(t.email, errors)
     validateUsername(t.username, errors)
-    validatePassword(t.password, errors)
 
     if (errors.isNotEmpty()) {
       logger.error("User is not valid.")
@@ -63,44 +62,6 @@ class UserRequestValidator : Validator<UserRequest> {
       errors.add(ValidationErrorMessages.USERNAME_INVALID_CHARS.message)
     } else {
       logger.debug("Valid username field.")
-    }
-  }
-
-  private fun validatePassword(password: String, errors: MutableList<String>) {
-    logger.debug("Validating password")
-    if (password.isBlank()) {
-      logger.error("Password is blank.")
-      errors.add(ValidationErrorMessages.BLANK_PASSWORD.message)
-      return
-    }
-
-    if (password.length < 8) {
-      logger.error("Password too short.")
-      errors.add(ValidationErrorMessages.PASSWORD_TOO_SHORT.message)
-    }
-
-    if (!password.any { it.isUpperCase() }) {
-      logger.error("Password missing uppercase letter.")
-      errors.add(ValidationErrorMessages.PASSWORD_NO_UPPERCASE.message)
-    }
-
-    if (!password.any { it.isLowerCase() }) {
-      logger.error("Password missing lowercase letter.")
-      errors.add(ValidationErrorMessages.PASSWORD_NO_LOWERCASE.message)
-    }
-
-    if (!password.any { it.isDigit() }) {
-      logger.error("Password missing digit.")
-      errors.add(ValidationErrorMessages.PASSWORD_NO_DIGIT.message)
-    }
-
-    if (!password.any { "!@#$%^&*()-_+=<>?/{}[]|\\~`".contains(it) }) {
-      logger.error("Password missing special character.")
-      errors.add(ValidationErrorMessages.PASSWORD_NO_SPECIAL.message)
-    }
-
-    if (errors.none { it.startsWith("Password") }) {
-      logger.debug("Valid password field.")
     }
   }
 }

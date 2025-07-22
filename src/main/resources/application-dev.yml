@@ -37,6 +37,20 @@ spring:
         max-file-size: 5MB
         max-request-size: 5MB
 
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        transport: smtp
+      debug: false
+      smtp:
+        auth: true
+      starttls:
+        enable: true
+
 jwt:
   key: ${JWT_KEY}
   access-token-expiration: 3600000000
@@ -45,6 +59,7 @@ logging:
   pattern:
     console: "[ %highlight(%-5level)] <%green(%d{yy-MM-dd HH:mm:ss}) %cyan(%logger{10})> %highlight(%msg%n)"
   level:
+    dev.wayron.book_tracker_api: info
     org.hibernate: warn
     org.springframework.security: error
 

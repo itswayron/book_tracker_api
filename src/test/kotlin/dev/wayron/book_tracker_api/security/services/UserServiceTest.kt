@@ -22,6 +22,7 @@ class UserServiceTest {
   private lateinit var encoder: PasswordEncoder
   private lateinit var validator: Validator<UserRequest>
   private lateinit var persistenceValidator: UserPersistenceValidator
+  private lateinit var passwordValidator: Validator<String>
   private lateinit var service: UserService
 
   private val request = UserRequest(
@@ -48,7 +49,8 @@ class UserServiceTest {
     encoder = mock()
     validator = mock()
     persistenceValidator = mock()
-    service = UserService(repository, encoder, validator, persistenceValidator)
+    passwordValidator = mock()
+    service = UserService(repository, encoder, validator, persistenceValidator, passwordValidator)
   }
 
   @Test

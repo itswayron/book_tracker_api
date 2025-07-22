@@ -24,9 +24,10 @@ class Configuration {
     userRepository: UserRepository,
     encoder: PasswordEncoder,
     validator: Validator<UserRequest>,
-    persistenceValidator: UserPersistenceValidator
+    persistenceValidator: UserPersistenceValidator,
+    passwordValidator: Validator<String>,
   ) =
-    UserService(userRepository, encoder, validator, persistenceValidator)
+    UserService(userRepository, encoder, validator, persistenceValidator, passwordValidator)
 
   @Bean
   fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
