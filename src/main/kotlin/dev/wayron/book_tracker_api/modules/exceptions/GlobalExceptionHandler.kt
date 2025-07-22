@@ -6,6 +6,8 @@ import dev.wayron.book_tracker_api.modules.exceptions.reading.*
 import dev.wayron.book_tracker_api.modules.exceptions.user.UserNotFoundException
 import dev.wayron.book_tracker_api.modules.exceptions.user.UserNotValidException
 import dev.wayron.book_tracker_api.security.exceptions.InvalidPasswordException
+import dev.wayron.book_tracker_api.security.exceptions.InvalidTokenException
+import dev.wayron.book_tracker_api.security.exceptions.TokenExpiredException
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -30,6 +32,8 @@ class GlobalExceptionHandler {
     UserNotValidException::class,
     UserNotFoundException::class,
     InvalidPasswordException::class,
+    TokenExpiredException::class,
+    InvalidTokenException::class,
   )
   @ResponseBody
   fun handleCustomExceptions(exception: Exception, request: HttpServletRequest): ResponseEntity<ApiError> {

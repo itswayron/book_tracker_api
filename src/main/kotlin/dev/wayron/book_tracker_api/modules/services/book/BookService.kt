@@ -14,7 +14,6 @@ import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
 import dev.wayron.book_tracker_api.modules.repositories.user.getCurrentUser
 import dev.wayron.book_tracker_api.modules.services.ImageService
 import dev.wayron.book_tracker_api.modules.validators.Validator
-import dev.wayron.book_tracker_api.utils.Sanitizers
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -36,8 +35,7 @@ class BookService(
 
     val user = userRepository.getCurrentUser()
     val book = request.toEntity(user)
-
-    val bookSanitized = Sanitizers.sanitizeBook(book)
+    val bookSanitized = book.sanitize()
     logger.debug("Book sanitized: {}", bookSanitized)
     validator.validate(bookSanitized)
 
@@ -78,7 +76,7 @@ class BookService(
     logger.debug("Original book data: {}", oldBook)
 
     var newBook = oldBook.updateWith(bookUpdated)
-    newBook = Sanitizers.sanitizeBook(newBook)
+    newBook = newBook.sanitize()
     logger.debug("Sanitized updated book: {}", newBook)
 
     validator.validate(newBook)
@@ -126,5 +124,15 @@ class BookService(
         logger.warn("Failed to delete cover image. Path={}, Reason={}", path, ex.message)
       }
     } ?: logger.debug("No existing cover image to delete for book ID={}", this.id)
+  }
+
+  private fun Book.sanitize(): Book {
+    return this.copy(
+      publisher = this.publisher?.takeIf { it.isNotBlank() },
+      language = this.language?.takeIf { it.isNotBlank() },
+      typeOfMedia = this.typeOfMedia?.takeIf { it.isNotBlank() },
+      isbn10 = this.isbn10?.takeIf { it.isNotBlank() },
+      isbn13 = this.isbn13?.takeIf { it.isNotBlank() }
+    )
   }
 }
