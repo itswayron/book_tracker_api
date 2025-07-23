@@ -9,6 +9,7 @@ import dev.wayron.book_tracker_api.security.services.PasswordResetService
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -47,6 +48,11 @@ class AuthController(
 
     response.addCookie(expiredCookie)
     response.status = HttpServletResponse.SC_NO_CONTENT
+  }
+
+  @GetMapping("/status")
+  fun checkStatus(): ResponseEntity<String> {
+    return ResponseEntity.ok("User authenticated.")
   }
 
   @PostMapping("/forgot-password")

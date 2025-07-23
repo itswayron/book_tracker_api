@@ -40,7 +40,7 @@ class BookValidatorTest {
       isbn13 = null,
       typeOfMedia = null,
       genres = null,
-      userId = user
+      user = user
     )
   }
 

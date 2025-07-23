@@ -8,9 +8,11 @@ import dev.wayron.book_tracker_api.modules.models.book.Book
 import dev.wayron.book_tracker_api.modules.models.book.BookPatch
 import dev.wayron.book_tracker_api.modules.models.book.BookRequest
 import dev.wayron.book_tracker_api.modules.models.book.BookResponse
+import dev.wayron.book_tracker_api.modules.models.user.Role
 import dev.wayron.book_tracker_api.modules.models.user.User
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
+import dev.wayron.book_tracker_api.modules.repositories.user.getCurrentUser
 import dev.wayron.book_tracker_api.modules.services.ImageService
 import dev.wayron.book_tracker_api.modules.validators.ValidationErrorMessages
 import dev.wayron.book_tracker_api.modules.validators.Validator
@@ -69,6 +71,7 @@ class BookServiceTest {
   @BeforeEach
   fun setUp() {
     user = User(
+      id = "some-non-null-id",
       usernameField = "john_doe",
       name = "John Doe",
       email = "Example email",
@@ -90,7 +93,7 @@ class BookServiceTest {
       genres = null,
       createdAt = Timestamp(System.currentTimeMillis()),
       updatedAt = Timestamp(System.currentTimeMillis()),
-      userId = user
+      user = user
     )
     bookRequest = BookRequest(
       title = book.title,
@@ -115,13 +118,13 @@ class BookServiceTest {
 
   @BeforeEach
   fun setupSecurityContext() {
-    val authentication = UsernamePasswordAuthenticationToken("Example user", null, emptyList())
+    val authentication = UsernamePasswordAuthenticationToken(user.username, null, emptyList())
     SecurityContextHolder.getContext().authentication = authentication
   }
 
   @Test
   fun `should successfully create a new book`() {
-    `when`(userRepository.findByUsernameField("Example user")).thenReturn(user)
+    `when`(userRepository.findByUsernameField(user.username)).thenReturn(user)
     `when`(repository.save(any<Book>())).thenReturn(book)
 
     val result = service.createBook(bookRequest)
@@ -137,7 +140,7 @@ class BookServiceTest {
     book.copy(title = "")
     val invalidBookRequest = bookRequest.copy(title = "")
 
-    `when`(userRepository.findByUsernameField("Example user")).thenReturn(user)
+    `when`(userRepository.findByUsernameField(user.username)).thenReturn(user)
 
     doThrow(BookNotValidException(listOf(ValidationErrorMessages.EMPTY_TITLE.message)))
       .`when`(validator).validate(any())
@@ -150,12 +153,28 @@ class BookServiceTest {
     verify(repository, never()).save(any<Book>())
   }
 
+  @Test
+  fun `should return a list of books successfully for regular user`() {
+    val books = listOf(book)
+    val pageableResponse = PageImpl(books)
+    `when`(repository.findVisibleBooksForUser(any(), any())).thenReturn(pageableResponse)
+    `when`(userRepository.findByUsernameField(user.username)).thenReturn(user)
+
+    val pageable = PageRequest.of(0, 10)
+    val result = service.getBooks(pageable)
+
+    assert(result.content.size == 1)
+    assert(result.content[0].title == "Example book")
+    verify(repository, times(1)).findVisibleBooksForUser(anyString(), any())
+  }
 
   @Test
-  fun `should return a list of books successfully`() {
+  fun `should return a list of books successfully for admin`() {
+    val admin = user.copy(role = Role.ADMIN)
     val books = listOf(book)
     val pageableResponse = PageImpl(books)
     `when`(repository.findAll(any<Pageable>())).thenReturn(pageableResponse)
+    `when`(userRepository.findByUsernameField(admin.username)).thenReturn(admin)
 
     val pageable = PageRequest.of(0, 10)
     val result = service.getBooks(pageable)

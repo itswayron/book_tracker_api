@@ -12,10 +12,9 @@ class ReadingSecurity(
   private val userRepository: UserRepository
 ) {
 
-  fun isOwner(sessionId: Int): Boolean {
+  fun isSessionOwner(sessionId: Int): Boolean {
     val session = sessionRepository.findEntityByIdOrThrow(sessionId)
     val currentUser = userRepository.getCurrentUser()
     return session.userId.id == currentUser.id
   }
-
 }

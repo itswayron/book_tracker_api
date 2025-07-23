@@ -8,6 +8,7 @@ import dev.wayron.book_tracker_api.modules.models.book.BookResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.toEntity
 import dev.wayron.book_tracker_api.modules.models.mappers.toResponse
 import dev.wayron.book_tracker_api.modules.models.mappers.updateWith
+import dev.wayron.book_tracker_api.modules.models.user.Role
 import dev.wayron.book_tracker_api.modules.repositories.book.BookRepository
 import dev.wayron.book_tracker_api.modules.repositories.findEntityByIdOrThrow
 import dev.wayron.book_tracker_api.modules.repositories.user.UserRepository
@@ -17,6 +18,7 @@ import dev.wayron.book_tracker_api.modules.validators.Validator
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.sql.Timestamp
@@ -48,9 +50,18 @@ class BookService(
 
   fun getBooks(pageable: Pageable): Page<BookResponse> {
     logger.info("Fetching paginated books from repository.")
-    val page = repository.findAll(pageable)
-    logger.info("Retrieved {} books.", page.content.size)
-    val response = page.map { book -> book.toResponse() }
+    val user = userRepository.getCurrentUser()
+
+    val page = if(user.role == Role.ADMIN) {
+      logger.debug("Fetching all books (admin access).")
+      repository.findAll(pageable)
+    } else {
+      logger.debug("Fetching visible books for user: '{}'.", user.id)
+      repository.findVisibleBooksForUser(user.id, pageable)
+    }
+
+    logger.debug("Retrieved {} books.", page.content.size)
+    val response = page.map { it.toResponse() }
     return response
   }
 
@@ -68,6 +79,7 @@ class BookService(
     return response
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @bookSecurity.isBookOwner(#command.first)")
   fun updateBook(command: Pair<Int, BookPatch>): BookResponse {
     val (id, bookUpdated) = command
     logger.info("Updating book ID={} with patch: {}", id, bookUpdated)
@@ -87,6 +99,7 @@ class BookService(
     return response
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @bookSecurity.isBookOwner(#id)")
   fun deleteBook(id: Int) {
     logger.info("Deleting book with ID={}", id)
 
@@ -99,6 +112,7 @@ class BookService(
     logger.info("Book deleted successfully. ID={}", id)
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @bookSecurity.isBookOwner(#id)")
   fun uploadCover(id: Int, coverFile: MultipartFile) {
     logger.info("Uploading cover for book ID={}", id)
     val book = repository.findEntityByIdOrThrow(id)

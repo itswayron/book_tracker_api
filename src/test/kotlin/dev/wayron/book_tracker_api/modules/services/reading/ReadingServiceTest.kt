@@ -103,7 +103,7 @@ class ReadingServiceTest {
       genres = null,
       createdAt = Timestamp(System.currentTimeMillis()),
       updatedAt = Timestamp(System.currentTimeMillis()),
-      userId = user
+      user = user
     )
     reading = ReadingSession(
       id = 1,

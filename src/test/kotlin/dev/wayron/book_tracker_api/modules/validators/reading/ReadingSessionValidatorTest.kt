@@ -34,7 +34,7 @@ class ReadingSessionValidatorTest {
       author = "Example author.",
       pages = 100,
       chapters = 10,
-      userId = user
+      user = user
     )
     session = ReadingSession(
       id = 1,

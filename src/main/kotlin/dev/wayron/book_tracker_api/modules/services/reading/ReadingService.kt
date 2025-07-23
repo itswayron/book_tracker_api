@@ -75,7 +75,7 @@ class ReadingService(
     return list
   }
 
-  @PreAuthorize("@readingSecurity.isOwner(#readingSessionId)")
+  @PreAuthorize("@readingSecurity.isSessionOwner(#readingSessionId)")
   fun addReading(readingSessionId: Int, quantityRead: Int): ReadingLogResponse {
     logger.info("Adding $quantityRead units to reading session ID: $readingSessionId")
     val session = getReadingSessionById(readingSessionId)
@@ -103,11 +103,11 @@ class ReadingService(
     return response
   }
 
+  @PreAuthorize("@readingSecurity.isSessionOwner(#readingSessionId)")
   fun deleteReadingById(readingSessionId: Int) {
     logger.info("Deleting reading session with ID: $readingSessionId")
     val deletedReading = sessionRepository.findEntityByIdOrThrow(readingSessionId)
     sessionRepository.deleteById(deletedReading.id)
     logger.info("Deleted reading session with ID: $readingSessionId successfully")
   }
-
 }

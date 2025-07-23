@@ -25,7 +25,11 @@ data class Book(
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
-  var userId: User,
+  var user: User,
+
+  @Column
+  @Enumerated(EnumType.STRING)
+  val visibility: Visibility = Visibility.PRIVATE,
 
   val synopsis: String? = null,
   val publisher: String? = null,
@@ -55,5 +59,4 @@ data class Book(
   protected fun onUpdate() {
     this.updatedAt = Timestamp(System.currentTimeMillis())
   }
-
 }

@@ -30,7 +30,7 @@ class ReadingLogValidatorTest {
       title = "Example book.",
       author = "Example title",
       pages = 100,
-      userId = user,
+      user = user,
     )
     val session = ReadingSession(
       id = 1,
